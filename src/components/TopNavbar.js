@@ -1,10 +1,14 @@
 import styled from 'styled-components'
+import '../fonts.css'
 import iconSquared from '../imgs/iconSquared.png'
+import settings from '../imgs/settings.png'
+import help from '../imgs/help.png'
+import whatsNew from '../imgs/whatsNew.png'
+
 
 const Container = styled.div`
     margin: auto;
-    padding-left: 30px;
-    padding-right: 25px;
+    padding: 13px;
     background: #0e005e;
 `
 
@@ -15,12 +19,13 @@ const Navbar = styled.div`
 `
 
 const Nav = styled.nav`
-    flex: 1;
+    //flex: 1;
     text-align: right;
 `
 const Ul = styled.ul`
     display: inline-block;
     list-style-type: none;
+    vertical-align: center;
 `
 const Li = styled.li`
     display: inline-block;
@@ -28,7 +33,7 @@ const Li = styled.li`
 `
 
 const Img = styled.img`
-    width: 30px;
+    width: 50px;
     padding-right:20px;
 `
 
@@ -41,14 +46,14 @@ const TopNavbar = () => {
   return (
     <Container>
         <Navbar>
-        <Img src={iconSquared} alt="" />
-            <p>To Do</p>
+            <Img src={iconSquared} alt="" />
+            <b>To Do</b>
             <Center><input placeholder="Search"></input></Center>
             <Nav>
                 <Ul>
-                    <Li><p>"settings"</p></Li>
-                    <Li><p>"help"</p></Li>
-                    <Li><p>"what's new"</p></Li>
+                    <Li><Img src={settings} alt="" /></Li>
+                    <Li><Img src={help} alt="" /></Li>
+                    <Li><Img src={whatsNew} alt="" /></Li>
                     <Li><p>Diogo Henrique</p></Li>
                 </Ul>
             </Nav>
