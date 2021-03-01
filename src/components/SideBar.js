@@ -40,21 +40,35 @@ const P = styled.p`
     color: black;
     display: block;
 `
+const Input = styled.input`
+    border: none !important;
+    background: #eeeeee;
+    font-size: 1.4rem;
+    width: 100%;
+    padding: 6px 6px 8px 6px;
+
+    &:hover{
+        background: rgb(248, 248, 248);
+    }
+`
+const Ul = styled.ul`
+    margin-bottom: 20px;
+`
 
 const SideBar = () => {
     return (
         <Wrapper>
             <SideBar2>
                 <H2><Img src={menu} alt="" /></H2>
-                <ul>
+                <Ul>
                     <Li><P>My day</P></Li>
                     <Li><P>Important</P></Li>
                     <Li><P>Planned</P></Li>
-                    <Li><P>portfolio</P></Li>
                     <Li><P>Assigned to you</P></Li>
                     <Li><P>Flagged email</P></Li>
                     <Li><P>Tasks</P></Li>
-                </ul> 
+                </Ul> 
+                <Input placeholder="+ New List"></Input>
             </SideBar2>
         </Wrapper>
         );
