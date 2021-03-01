@@ -41,14 +41,23 @@ const Center = styled.div`
     flex: 1;
     text-align: center;
 `
-
+const Input = styled.input`
+    padding: 8px;
+    cursor: pointer;
+    width: 400px;
+    height: 32px;
+    transition: background-color 0.1s;
+    background: rgb(191, 207, 230);
+    border: none;
+    border-radius: 2px;
+`
 const TopNavbar = () => {
   return (
     <Container>
         <Navbar>
             <Img src={iconSquared} alt="" />
             <b>To Do</b>
-            <Center><input placeholder="Search"></input></Center>
+            <Center><Input placeholder="Search"></Input></Center>
             <Nav>
                 <Ul>
                     <Li><Img src={settings} alt="" /></Li>
