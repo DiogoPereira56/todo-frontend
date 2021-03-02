@@ -3,6 +3,8 @@ import '../fonts.css'
 import menu from '../imgs/menu.png'
 
 const SideBar = () => {
+    
+
     return (
         <Wrapper>
             <SideBar2>
@@ -15,7 +17,14 @@ const SideBar = () => {
                     <Li><P>Flagged email</P></Li>
                     <Li><P>Tasks</P></Li>
                 </Ul> 
-                <Input placeholder="+ New List"></Input>
+                <form>
+                    <Input placeholder="+ New List"></Input>
+                </form>
+                {
+                //{ error && <div>{ error }</div> }
+                //{ isPending && <div>Loading...</div> }
+                //{ listTasks && <BlogList listTasks={listTasks} /> }
+                }
             </SideBar2>
         </Wrapper>
         );

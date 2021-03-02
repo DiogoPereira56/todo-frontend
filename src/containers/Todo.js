@@ -3,6 +3,7 @@ import '../fonts.css'
 import CenterColumn from '../components/CenterColumn';
 import SideBar from '../components/SideBar';
 import TopNavbar from '../components/TopNavbar';
+//import useFetch from "../components/useFetch";
 
 const Wrapper = styled.div`
   display: flex;
@@ -14,6 +15,7 @@ const Wrapper = styled.div`
 `
 
 const Todo = () => {
+  //const { error, isPending, data: blogs } = useFetch('http://localhost:8000/blogs')
   return (
     <div>
       <TopNavbar />
