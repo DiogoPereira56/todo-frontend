@@ -1,6 +1,6 @@
 import {Wrapper, SideBar2, H2, Img, Li, P, Input, Ul} from './SideBar.styles'
-import '../fonts.css'
-import menu from '../imgs/menu.png'
+import '../../fonts.css'
+import menu from '../../imgs/menu.png'
 
 const SideBar = () => {
     

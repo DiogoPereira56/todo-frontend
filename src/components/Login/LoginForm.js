@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {Wrapper, Aside, Content, Flexbox, Form, Button, Label, Input } from './LoginForm.style'
+import {Wrapper, Aside, Flexbox, Form, Button, Label, Input } from '../Login/LoginForm.style'
 //import Login from '../imgs/Login.png'
 
 //TODO: Try to put an imagem on the background

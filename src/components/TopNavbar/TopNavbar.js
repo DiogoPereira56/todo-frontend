@@ -1,9 +1,9 @@
-import '../fonts.css'
+import '../../fonts.css'
 import {Container, Navbar, Nav, Ul, Li, Img, Center, Input} from './TopNavbar.styles'
-import iconSquared from '../imgs/iconSquared.png'
-import settings from '../imgs/settings.png'
-import help from '../imgs/help.png'
-import whatsNew from '../imgs/whatsNew.png'
+import iconSquared from '../../imgs/iconSquared.png'
+import settings from '../../imgs/settings.png'
+import help from '../../imgs/help.png'
+import whatsNew from '../../imgs/whatsNew.png'
 
 const TopNavbar = () => {
   return (

@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import '../fonts.css'
-import CenterColumn from '../components/CenterColumn';
-import SideBar from '../components/SideBar';
-import TopNavbar from '../components/TopNavbar';
+import CenterColumn from '../components/CenterColumn/CenterColumn.js';
+import SideBar from '../components/SideBar/SideBar.js';
+import TopNavbar from '../components/TopNavbar/TopNavbar.js';
 //import useFetch from "../components/useFetch";
 
 const Wrapper = styled.div`
@@ -15,7 +15,7 @@ const Wrapper = styled.div`
 `
 
 const Todo = () => {
-  //const { error, isPending, data: blogs } = useFetch('http://localhost:8000/blogs')
+  //const { error, isPending, data: tasks } = useFetch('http://localhost:8000/tasks')
   return (
     <div>
       <TopNavbar />

@@ -1,13 +1,12 @@
 
 
-const BlogList = ({ blogs }) => {
+const BlogList = ({ tasks }) => {
   return (
-    <div className="blog-list">
-      {blogs.map(blog => (
-        <div className="blog-preview" key={blog.id} >
-          <Link to={`/blogs/${blog.id}`}>
-            <h2>{ blog.title }</h2>
-            <p>Written by { blog.author }</p>
+    <div>
+      {tasks.map(task => (
+        <div key={task.id} >
+          <Link to={`/task/${task.id}`}>
+            <h2>{ task.title }</h2>
           </Link>
         </div>
       ))}

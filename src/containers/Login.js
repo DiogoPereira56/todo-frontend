@@ -1,6 +1,6 @@
 import '../fonts.css'
-import LoginHeader from '../components/LoginHeader.js';
-import LoginForm from '../components/LoginForm.js';
+import LoginHeader from '../components/Login/LoginHeader.js';
+import LoginForm from '../components/Login/LoginForm.js';
 
 
 const Login = () => {

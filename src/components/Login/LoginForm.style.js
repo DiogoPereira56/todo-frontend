@@ -22,9 +22,6 @@ const Aside = styled.div`
         background-color: rgb(214, 214, 214)
     }
 `
-const Content = styled.div`
-    
-`
 const Form = styled.form`
     padding: 20px;
 `
@@ -55,4 +52,4 @@ const Input = styled.input`
     margin-top: 10px;
 `
 
-export {Wrapper, Aside, Content, Flexbox, Form, Button, Label, Input }
+export {Wrapper, Aside, Flexbox, Form, Button, Label, Input }
