@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 const Container = styled.div`
     margin: auto;
-    padding: 13px;
+    padding: 10px;
     background: #0e005e;
 `
 

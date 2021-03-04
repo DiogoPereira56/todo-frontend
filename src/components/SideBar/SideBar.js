@@ -16,10 +16,15 @@ const SideBar = () => {
                     <Li><P>Assigned to you</P></Li>
                     <Li><P>Flagged email</P></Li>
                     <Li><P>Tasks</P></Li>
-                </Ul> 
-                <form>
-                    <Input placeholder="+ New List"></Input>
-                </form>
+                </Ul>
+                
+                <Li><P>List1</P></Li>
+                <Li><P>List2</P></Li>
+                
+                    <form>
+                        <Input placeholder=" +  New List"></Input>
+                    </form>
+                
                 {
                 //{ error && <div>{ error }</div> }
                 //{ isPending && <div>Loading...</div> }

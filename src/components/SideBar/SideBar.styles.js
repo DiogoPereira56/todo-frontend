@@ -17,14 +17,14 @@ const H2 = styled.h2`
     margin-left: 10px;
 `
 const Img = styled.img`
-    width: 40px;
+    width: 35px;
     
     &:hover{
         background: rgb(248, 248, 248);
     }
 `
 const Li = styled.li`
-    padding: 15px;
+    padding: 10px;
     border-bottom: 1px solid #bdb8d7;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -36,11 +36,12 @@ const Li = styled.li`
 const P = styled.p`
     color: black;
     display: block;
+    font-size: 0.8rem;
 `
 const Input = styled.input`
     border: none !important;
     background: #eeeeee;
-    font-size: 1.4rem;
+    font-size: 1.0rem;
     width: 100%;
     padding: 6px 6px 8px 6px;
 
