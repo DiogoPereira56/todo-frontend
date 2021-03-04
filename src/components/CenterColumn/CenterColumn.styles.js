@@ -8,6 +8,37 @@ const TasksToolbar = styled.div`
     padding: 12px 16px 0 16px;
     display: flex;
 `
+const Wrapper = styled.div`
+  display: flex;
+  flex: 1 1 0px;
+  will-change: width;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+`
+//Description Bar
+const DescriptionContainer = styled.div`
+    width: 350px;
+    height: 100%;
+    background: #eeeeee;
+    position: fixed;
+    right: 0%;
+    padding: 10px;
+`
+const Description = styled.input`
+    margin: 10px;
+    padding: 16px;
+    border: 1px solid #eaeaea;
+    border-width: 1px;
+    border-radius: 2px;
+    width: 94%;
+    height: 200px;
+`
+const Hide = styled.img`
+    margin-left: 10px;
+    width: 20px;
+    cursor: pointer;
+`
 //List tittle
 const TasksToolbarTitleContainer = styled.div`
     display: flex;
@@ -30,7 +61,11 @@ const Img = styled.img`
 
 //Task Sorter
 const TaskToolbarRight = styled.div`
-    margin-left: 950px;
+    //margin-left: 950px;
+    margin-left: ${props => (props.changeLayout) ? '600px' : '950px'};
+`
+const ChangeTask = styled(TaskToolbarRight)`
+    margin-left: 600px;
 `
 const Button = styled.button`
     cursor: pointer;
@@ -77,5 +112,7 @@ const Task = styled.div`
 const CheckBox = styled.input`
     margin-right: 10px;
 `
+
 export {CenterBar, TasksToolbar, TasksToolbarTitleContainer, TasksToolbarTitleItem, H2, 
-    Img, TaskToolbarRight, Button, BaseAdd, Add, Input, Task, CheckBox}
+    Img, TaskToolbarRight, Button, BaseAdd, Add, Input, Task, CheckBox, ChangeTask, 
+    DescriptionContainer, Description, Wrapper, Hide}
