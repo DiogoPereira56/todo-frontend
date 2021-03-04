@@ -25,7 +25,7 @@ const LoginForm = () => {
           <Aside onClick={() => setLogIn(true)}>Log in</Aside>
         </Flexbox>
 
-        <Content>
+        
           {logIn && (
             <Form onSubmit={(handleLogIn)}>
               <Label>Log In</Label><br/>
@@ -43,7 +43,7 @@ const LoginForm = () => {
               <Button>NEXT</Button>
             </Form>
           )}
-        </Content>
+        
 
     </Wrapper>
     );
