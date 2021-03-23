@@ -22,7 +22,7 @@ const Aside = styled.div`
         background-color: rgb(214, 214, 214)
     }
 `
-const Form = styled.form`
+const FormPadding = styled.div`
     padding: 20px;
 `
 const Button = styled.button`
@@ -52,4 +52,4 @@ const Input = styled.input`
     margin-top: 10px;
 `
 
-export {Wrapper, Aside, Flexbox, Form, Button, Label, Input }
+export {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input }
