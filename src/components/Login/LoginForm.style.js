@@ -52,4 +52,8 @@ const Input = styled.input`
     margin-top: 10px;
 `
 
-export {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input }
+const Warnning = styled.div`
+    color: red;
+`
+
+export {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input, Warnning }

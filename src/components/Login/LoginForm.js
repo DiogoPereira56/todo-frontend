@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input } from '../Login/LoginForm.style'
+import {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input, Warnning } from '../Login/LoginForm.style'
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useHistory } from "react-router-dom";
@@ -10,17 +10,20 @@ const LoginForm = () => {
 
   const [logIn, setLogIn] = useState(true);
   const [wrongCredentials, setWrongCredentials] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [mailInUse, setMailInUse] = useState(false);
   const history = useHistory();
 
   const handleLogIn = (values) => {
+    makeLogIn(values);
+  }
+
+  function makeLogIn(values) {
     fetch('http://localhost:3000/graphql', {
       method: 'POST',
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        query:`
-          mutation getClient($email: String!, $password: String!) {
+        query: `
+          mutation clientLogin($email: String!, $password: String!) {
             login(
               email:$email,
               password:$password
@@ -37,28 +40,67 @@ const LoginForm = () => {
         variables: values
       })
     })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.data) {
+          console.log('wrong credentials');
+          values.email = '';
+          values.password = '';
+          setWrongCredentials(true);
+        }
+        else
+          /* console.log(data.data); */
+          history.push('/Todo');
+      });
+
+  }
+
+  const handleRegister = (values) => {
+    fetch('http://localhost:3000/graphql', {
+      method: 'POST',
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        query:`
+          mutation clientRegister(
+            $email: String!, 
+            $name: String!, 
+            $password: String!
+          ){
+            register(
+              input: {
+                name: $name
+                email: $email
+                password: $password
+              }
+            ){
+              idClient
+              name
+            }
+          }
+        `,
+        variables: values
+      })
+    })
     .then(res => res.json())
     .then(data => {
       if(!data.data){
-        console.log('wrong credentials');
-        setWrongCredentials(true);
+        console.log('Something went wrong, ups!');
+        setMailInUse(true);
       }
       else
         /* console.log(data.data); */
-        history.push('/Todo');
+        makeLogIn(values);
     });
     
-    
-  }
-
-  const handleRegister = (e) => {
-    console.log("i'll remove this later, it's just to stop the email var warning");
   }
 
   const validate = Yup.object({
     email: Yup.string()
       .email('Email is invalid')
-      .required('Required'),
+      .required('Email is Required'),
+    name: Yup.string()
+      .min(3, 'Name must be at least 3 characters')
+      .required('A name is required'),
     password: Yup.string()
       .min(6, 'Password must be at least 6 characters')
       .required('Password is Required'),
@@ -80,7 +122,6 @@ const LoginForm = () => {
                 email: '', 
                 password: '',
               }}
-              validationSchema={validate}
               onSubmit={(handleLogIn)}
             >
               {({values, errors}) => (
@@ -88,10 +129,10 @@ const LoginForm = () => {
                   <Label>Log In</Label><br/>
                   <Field placeholder="Email" autoComplete="off" name="email" /><br/>
                   <ErrorMessage name="email" /><br/>
-                  <Field placeholder="Password" autoComplete="off" name="password" /><br/>
+                  <Field placeholder="Password" autoComplete="off" name="password" type="password" /><br/>
                   <ErrorMessage name="password" /><br/>
                   <Button type="submit">NEXT</Button>
-                  {wrongCredentials && (<p>Wrong Credentials<br/></p>)}
+                  {wrongCredentials && (<Warnning><br/>Wrong Email or Password<br/></Warnning>)}
                   <pre>{JSON.stringify(values, null, 2)}</pre>
                   <pre>{JSON.stringify(errors, null, 2)}</pre>
                 </Form>
@@ -101,12 +142,33 @@ const LoginForm = () => {
         )}
 
         {!logIn && (
-          <FormPadding onSubmit={(handleRegister)}>
-            <Label>Register</Label><br/>
-            <Input placeholder="Email" onChange={(e) => setEmail(e.target.value)} /><br/><br/>
-            <Input placeholder="Password" onChange={(e) => setPassword(e.target.value)} /><br/><br/>
-            <Button>NEXT</Button>
-          </FormPadding>
+          <FormPadding>
+          <Formik
+            initialValues={{ 
+              email: '', 
+              name: '',
+              password: '',
+            }}
+            validationSchema={validate}
+            onSubmit={(handleRegister)}
+          >
+            {({values, errors}) => (
+              <Form>
+                <Label>Register</Label><br/>
+                <Field placeholder="Email" autoComplete="off" name="email" /><br/>
+                {mailInUse && (<Warnning>Email already in use, sorry<br/></Warnning>)}
+                <ErrorMessage name="email" /><br/>
+                <Field placeholder="Name" autoComplete="off" name="name" /><br/>
+                <ErrorMessage name="name" /><br/>
+                <Field placeholder="Password" autoComplete="off" name="password" type="password" /><br/>
+                <ErrorMessage name="password" /><br/>
+                <Button type="submit">NEXT</Button>
+                <pre>{JSON.stringify(values, null, 2)}</pre>
+                <pre>{JSON.stringify(errors, null, 2)}</pre>
+              </Form>
+            )}
+          </Formik>
+        </FormPadding>
         )}
     
     </Wrapper>
