@@ -10,17 +10,15 @@ mutation clientLogin($email: String!, $password: String!) {
 `;
 
 export const REGISTER_USER_MUTATION = gql`
-mutation clientRegister(
+  mutation clientRegister(
     $email: String!, 
     $name: String!, 
     $password: String!
   ){
     register(
-      input: {
         name: $name
         email: $email
         password: $password
-      }
     )
   }
 `;
