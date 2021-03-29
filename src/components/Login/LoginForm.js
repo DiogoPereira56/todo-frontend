@@ -3,7 +3,7 @@ import {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input, Warnning } f
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useHistory } from "react-router-dom";
-import { LOGIN_USER_MUTATION, LOGIN_REGISTER_MUTATION } from '../../graphQL/Mutations';
+import { LOGIN_USER_MUTATION, REGISTER_USER_MUTATION } from '../../graphQL/Mutations';
 import { useMutation } from '@apollo/client';
 //import Login from '../imgs/Login.png'
 
@@ -14,7 +14,7 @@ const LoginForm = () => {
   const [wrongCredentials, setWrongCredentials] = useState(false);
   const [mailInUse, setMailInUse] = useState(false);
   const [login, { errorLogin }] = useMutation(LOGIN_USER_MUTATION);
-  const [register, { errorResgister }] = useMutation(LOGIN_REGISTER_MUTATION);
+  const [register, { errorResgister }] = useMutation(REGISTER_USER_MUTATION);
   const history = useHistory();
 
   const handleLogIn = (values) => {
@@ -25,8 +25,8 @@ const LoginForm = () => {
   function makeLogIn(values) {
     login({variables: values })
       .then(data => {
-        if (!data.data) {
-          console.log('wrong credentials');
+        if (!data.data.login) {
+          console.log('Wrong Email or Password');
           values.email = '';
           values.password = '';
           setWrongCredentials(true);
@@ -35,7 +35,7 @@ const LoginForm = () => {
           /* console.log(data.data); */
           history.push('/Todo');
       });
-
+    
   }
 
   const handleRegister = (values) => {
