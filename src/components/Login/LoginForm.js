@@ -27,7 +27,6 @@ const LoginForm = () => {
       .then(data => {
         if (!data.data.login) {
           console.log('Wrong Email or Password');
-          values.email = '';
           values.password = '';
           setWrongCredentials(true);
         }
@@ -41,8 +40,8 @@ const LoginForm = () => {
   const handleRegister = (values) => {
     register({variables: values })
       .then(data => {
-        if(!data.data){
-          console.log('Something went wrong, ups!');
+        if(!data.data.register){
+          /* console.log('Something went wrong, ups!'); */
           setMailInUse(true);
         }
         else
@@ -95,9 +94,9 @@ const LoginForm = () => {
                 <Form>
                   <Label>Log In</Label><br/>
                   <Field placeholder="Email" autoComplete="off" name="email" as={Input} /><br/>
-                  <ErrorMessage name="email" /><br/>
+                  <Warnning><ErrorMessage name="email" /><br/></Warnning>
                   <Field placeholder="Password" autoComplete="off" name="password" type="password" as={Input}/><br/>
-                  <ErrorMessage name="password" /><br/>
+                  <Warnning><ErrorMessage name="password" /><br/><br/></Warnning>
                   <Button type="submit">NEXT</Button>
                   {wrongCredentials && (<Warnning><br/>Wrong Email or Password<br/></Warnning>)}
                 </Form>
@@ -122,11 +121,11 @@ const LoginForm = () => {
                 <Label>Register</Label><br/>
                 <Field placeholder="Email" autoComplete="off" name="email" as={Input} /><br/>
                 {mailInUse && (<Warnning>Email already in use, sorry<br/></Warnning>)}
-                <ErrorMessage name="email"/><br/>
+                <Warnning><ErrorMessage name="email"/><br/></Warnning>
                 <Field placeholder="Name" autoComplete="off" name="name" as={Input} /><br/>
-                <ErrorMessage name="name" /><br/>
+                <Warnning><ErrorMessage name="name" /><br/></Warnning>
                 <Field placeholder="Password" autoComplete="off" name="password" type="password" as={Input} /><br/>
-                <ErrorMessage name="password" /><br/>
+                <Warnning><ErrorMessage name="password" /><br/><br/></Warnning>
                 <Button type="submit">NEXT</Button>
               </Form>
             )}
