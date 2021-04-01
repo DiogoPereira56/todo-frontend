@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input, Warnning } from '../Login/LoginForm.style'
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useHistory } from "react-router-dom";
 import { LOGIN_USER_MUTATION, REGISTER_USER_MUTATION } from '../../graphQL/Mutations';
-import { useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { DECODED_TOKEN } from '../../graphQL/Queries';
 //import Login from '../imgs/Login.png'
 
 //TODO: Try to put an imagem on the background
@@ -16,6 +17,7 @@ const LoginForm = () => {
   const [login, { errorLogin }] = useMutation(LOGIN_USER_MUTATION);
   const [register, { errorResgister }] = useMutation(REGISTER_USER_MUTATION);
   const history = useHistory();
+  const [decoded, {loading}] = useLazyQuery(DECODED_TOKEN);
 
   const handleLogIn = (values) => {
     makeLogIn(values);

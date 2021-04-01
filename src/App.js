@@ -18,8 +18,9 @@ const link = from([
 ])
 
 const client = new ApolloClient({
+  credentials: 'include',
   cache: new InMemoryCache(),
-  link: link
+  uri: "http://localhost:3000/graphql"
 })
 
 function App() {

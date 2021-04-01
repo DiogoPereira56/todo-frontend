@@ -3,7 +3,10 @@ import '../fonts.css'
 import CenterColumn from '../components/CenterColumn/CenterColumn.js';
 import SideBar from '../components/SideBar/SideBar.js';
 import TopNavbar from '../components/TopNavbar/TopNavbar.js';
-//import useFetch from "../components/useFetch";
+import { useQuery } from '@apollo/client';
+import { DECODED_TOKEN } from '../graphQL/Queries';
+import { useEffect } from 'react';
+
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,14 +18,25 @@ const Wrapper = styled.div`
 `
 
 const Todo = () => {
-  //const { error, isPending, data: tasks } = useFetch('http://localhost:8000/tasks')
+
+    const {error, loading, data} = useQuery(DECODED_TOKEN);
+  
+  useEffect(() => {
+    console.log(data);
+    /* console.log(data.getDecodedToken.id); */
+  })
+
   return (
     <div>
-      <TopNavbar />
+      {loading && (<div>Loading...</div>)}
+      {error && (<div>{error.message} Error, <br/><br/>Please try again later</div>)}
+      {data && (data!='invalid') && ( <TopNavbar /> )}
+      {data && (data!='invalid') && ( 
       <Wrapper>
         <SideBar />
         <CenterColumn />
       </Wrapper>
+      )}
     </div>
   );
 }
