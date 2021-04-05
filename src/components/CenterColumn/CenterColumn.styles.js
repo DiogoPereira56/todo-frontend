@@ -113,6 +113,26 @@ const CheckBox = styled.input`
     margin-right: 10px;
 `
 
+//List Options
+const Options = styled.div`
+    width: 150px;
+    background-color: white;
+    position: absolute;
+    border: 2px solid #eee;
+`
+
+const Actions = styled.div`
+    padding: 10px;
+    border-bottom: 1px solid #bdb8d7;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+
+    &:hover{
+        background: rgb(248, 248, 248);
+    }   
+`
+
 export {CenterBar, TasksToolbar, TasksToolbarTitleContainer, TasksToolbarTitleItem, H2, 
     Img, TaskToolbarRight, Button, BaseAdd, Add, Input, Task, CheckBox, ChangeTask, 
-    DescriptionContainer, Description, Wrapper, Hide}
+    DescriptionContainer, Description, Wrapper, Hide, Options, Actions}

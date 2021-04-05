@@ -7,8 +7,9 @@ import ListOfTasks from './ListOfTasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
+import { PropTypes } from 'prop-types'
 
-const SideBar = () => {
+const SideBar = ({setActiveList}) => {
     
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
     //todo: try and change 'refetch', to 'cache'
@@ -56,7 +57,7 @@ const SideBar = () => {
                     <Li><P>Tasks</P></Li>
                 </Ul>
 
-                <ListOfTasks lists={data.lists} />
+                <ListOfTasks lists={data.lists} setActiveList={setActiveList}/>
                 
                 <Formik
                     initialValues={{ listName: '' }}
@@ -73,6 +74,10 @@ const SideBar = () => {
             </SideBar2>
         </Wrapper>
         );
+    }
+
+    SideBar.propTypes = {
+        setActiveList: PropTypes.func,
     }
     
     export default SideBar;

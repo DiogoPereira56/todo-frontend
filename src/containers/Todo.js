@@ -5,7 +5,7 @@ import SideBar from '../components/SideBar/SideBar.js';
 import TopNavbar from '../components/TopNavbar/TopNavbar.js';
 import { useQuery } from '@apollo/client';
 import { DECODED_TOKEN } from '../graphQL/Queries';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 const Wrapper = styled.div`
@@ -18,22 +18,9 @@ const Wrapper = styled.div`
 `
 
 const Todo = () => {
-
+  const [activeList, setActiveList] = useState('Select a List');
   const {error: errorAuth, loading: loadingAuth, data: dataAuth} = useQuery(DECODED_TOKEN);
-  /* const [decoded, {loading}] = useLazyQuery(DECODED_TOKEN); */
-  /* const {error, loading, data: lists, refetch} = useQuery(GET_ALL_LISTS); */
   
-  /* useEffect(() => {
-    
-  }, []) */
-
-  /* if(loading){
-    return <div>loading...</div>
-  }
-  if(error){
-      return <div>error...</div>
-  } */
-
   return (
     <div>
       {loadingAuth && (<div>Loading...</div>)}
@@ -41,8 +28,8 @@ const Todo = () => {
       {dataAuth && ( <TopNavbar /> )}
       {dataAuth && ( 
       <Wrapper>
-        <SideBar />
-        <CenterColumn />
+        <SideBar setActiveList={setActiveList}/>
+        <CenterColumn activeList={activeList}/>
       </Wrapper>
       )}
     </div>
