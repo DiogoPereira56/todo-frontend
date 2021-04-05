@@ -28,6 +28,7 @@ const Li = styled.li`
     border-bottom: 1px solid #bdb8d7;
     border-bottom: 1px solid rgba(0,0,0,0.05);
     border-top: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
 
     &:hover{
         background: rgb(248, 248, 248);

@@ -19,19 +19,27 @@ const Wrapper = styled.div`
 
 const Todo = () => {
 
-    const {error, loading, data} = useQuery(DECODED_TOKEN);
+  const {error: errorAuth, loading: loadingAuth, data: dataAuth} = useQuery(DECODED_TOKEN);
+  /* const [decoded, {loading}] = useLazyQuery(DECODED_TOKEN); */
+  /* const {error, loading, data: lists, refetch} = useQuery(GET_ALL_LISTS); */
   
-  useEffect(() => {
-    console.log(data);
-    /* console.log(data.getDecodedToken.id); */
-  })
+  /* useEffect(() => {
+    
+  }, []) */
+
+  /* if(loading){
+    return <div>loading...</div>
+  }
+  if(error){
+      return <div>error...</div>
+  } */
 
   return (
     <div>
-      {loading && (<div>Loading...</div>)}
-      {error && (<div>{error.message} Error, <br/><br/>Please try again later</div>)}
-      {data && (data!='invalid') && ( <TopNavbar /> )}
-      {data && (data!='invalid') && ( 
+      {loadingAuth && (<div>Loading...</div>)}
+      {errorAuth && (<div>{errorAuth.message} Error, <br/><br/>Please try again later</div>)}
+      {dataAuth && ( <TopNavbar /> )}
+      {dataAuth && ( 
       <Wrapper>
         <SideBar />
         <CenterColumn />

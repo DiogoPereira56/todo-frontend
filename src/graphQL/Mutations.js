@@ -22,3 +22,11 @@ export const REGISTER_USER_MUTATION = gql`
     )
   }
 `;
+
+export const NEW_LIST_MUTATION = gql`
+  mutation addNewList($listName: String!){
+    addList(
+      listName:$listName,
+    )
+  }
+`;

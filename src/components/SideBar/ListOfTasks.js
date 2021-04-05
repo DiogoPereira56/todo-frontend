@@ -1,15 +1,21 @@
+import { PropTypes } from 'prop-types'
+import { Li, P } from './SideBar.styles'
 
+const ListOfTasks = ( {lists} ) => {
 
-const ListOfTasks = ({ lists }) => {
   return (
     <div>
-      {lists.map(list => (
-        <div key={list.idList} >
-            <h2>{ list.listName }</h2>
-        </div>
+      { lists.map(list => (
+        <Li key={list.idList} >
+            <P>{ list.listName }</P>
+        </Li>
       ))}
     </div>
   );
 }
  
+ListOfTasks.propTypes = {
+  lists: PropTypes.array.isRequired,
+};
+
 export default ListOfTasks;

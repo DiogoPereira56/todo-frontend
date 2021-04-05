@@ -17,7 +17,7 @@ const LoginForm = () => {
   const [login, { errorLogin }] = useMutation(LOGIN_USER_MUTATION);
   const [register, { errorResgister }] = useMutation(REGISTER_USER_MUTATION);
   const history = useHistory();
-  const [decoded, {loading}] = useLazyQuery(DECODED_TOKEN);
+  /* const [decoded, {loading}] = useLazyQuery(DECODED_TOKEN); */
 
   const handleLogIn = (values) => {
     makeLogIn(values);

@@ -15,3 +15,13 @@ export const LOG_OUT = gql`
     removeToken
   }
 `
+
+export const GET_ALL_LISTS = gql`
+  {
+    lists{
+      idList
+      idClient
+      listName
+    }
+  }
+`
