@@ -25,3 +25,21 @@ export const GET_ALL_LISTS = gql`
     }
   }
 `
+
+export const GET_CLIENT_INFORMATION = gql`
+{
+  getClientInformation{
+    name
+    lists{
+      idList
+      listName
+      tasks{
+        idTask
+        title
+        complete
+        description
+      }
+    }
+  }
+}
+`

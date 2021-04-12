@@ -59,6 +59,15 @@ const Img = styled.img`
     }
 `
 
+const ListInput = styled.input`
+    padding: 15px 0px;
+    border: none;
+    font-size: 1rem;
+    width: 140px;
+    height: 30px;
+    
+`
+
 //Task Sorter
 const TaskToolbarRight = styled.div`
     //margin-left: 950px;
@@ -135,4 +144,4 @@ const Actions = styled.div`
 
 export {CenterBar, TasksToolbar, TasksToolbarTitleContainer, TasksToolbarTitleItem, H2, 
     Img, TaskToolbarRight, Button, BaseAdd, Add, Input, Task, CheckBox, ChangeTask, 
-    DescriptionContainer, Description, Wrapper, Hide, Options, Actions}
+    DescriptionContainer, Description, Wrapper, Hide, Options, Actions, ListInput}

@@ -8,12 +8,19 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
 import { PropTypes } from 'prop-types'
+import { useEffect, useState } from 'react';
+import { array } from 'yup/lib/locale';
 
-const SideBar = ({setActiveList}) => {
+const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename }) => {
     
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
     //todo: try and change 'refetch', to 'cache'
-    const {error, loading, data, refetch} = useQuery(GET_ALL_LISTS);
+    //const {error, loading, data, refetch} = useQuery(GET_ALL_LISTS);
+
+    useEffect(() => {
+        if(lists)
+            setActiveList(lists[0]);
+    }, [])
 
     const handleNewList = (values) => {
         makeNewList({variables: values })
@@ -27,22 +34,16 @@ const SideBar = ({setActiveList}) => {
         refetch();
         values.listName = '';
     
-      }
+    }
 
     if(errorNewList){
-        return <div>error...</div>
-    }
-    if(loading){
-        return <div>loading...</div>
-    }
-    if(error){
         return <div>error...</div>
     }
 
     const validateNewList = Yup.object({
         listName: Yup.string()
           .required('A Name is Required'),
-      })
+    })
 
     return (
         <Wrapper>
@@ -57,7 +58,12 @@ const SideBar = ({setActiveList}) => {
                     <Li><P>Tasks</P></Li>
                 </Ul>
 
-                <ListOfTasks lists={data.lists} setActiveList={setActiveList}/>
+                <ListOfTasks 
+                    lists={lists} 
+                    setActiveList={setActiveList}
+                    setChangeLayout={setChangeLayout}
+                    setRename={setRename}
+                />
                 
                 <Formik
                     initialValues={{ listName: '' }}
@@ -66,7 +72,7 @@ const SideBar = ({setActiveList}) => {
                     >
                     {({values, errors}) => (
                         <Form>
-                        <Field placeholder=" +  New List" autoComplete="off" name="listName" as={Input} /><br/>
+                            <Field placeholder=" +  New List" autoComplete="off" name="listName" as={Input} /><br/>
                         </Form>
                     )}
                 </Formik>
@@ -77,7 +83,12 @@ const SideBar = ({setActiveList}) => {
     }
 
     SideBar.propTypes = {
+        lists: PropTypes.array,
+        refetch: PropTypes.func,
         setActiveList: PropTypes.func,
+        lista: PropTypes.object,
+        setChangeLayout: PropTypes.func,
+        setRename: PropTypes.func
     }
     
     export default SideBar;

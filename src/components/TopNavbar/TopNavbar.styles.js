@@ -44,4 +44,9 @@ const Input = styled.input`
     border: none;
     border-radius: 2px;
 `
-export {Container, Navbar, Nav, Ul, Li, Img, Center, Input};
+
+const A = styled.a`
+    text-decoration: none;
+    color: white;
+`
+export {Container, Navbar, Nav, Ul, Li, Img, Center, Input, A};
