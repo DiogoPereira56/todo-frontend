@@ -18,15 +18,13 @@ const Wrapper = styled.div`
 `
 
 const Todo = () => {
-  /* const {error: errorAuth, loading: loadingAuth, data: dataAuth} = useQuery(DECODED_TOKEN); */
+  //Queries
   const {error: errorAuth, loading: loadingAuth, data: dataClient, refetch} = useQuery(GET_CLIENT_INFORMATION);
+  //Layout states
+  const [showOptions, setShowOptions] = useState(false);
   const [rename, setRename] = useState(false);
   const [changeLayout, setChangeLayout] = useState(false);
   const [activeList, setActiveList] = useState();
-  
-  //var listActivated;
-  /* console.log(dataClient.getClientInformation.lists[0].listName) */
-  /* console.log(dataClient.getClientInformation.lists) */
 
   return (
     <div>
@@ -41,6 +39,7 @@ const Todo = () => {
           setActiveList={setActiveList}
           setChangeLayout={setChangeLayout}
           setRename={setRename}
+          setShowOptions={setShowOptions}
         />
         
         <CenterColumn 
@@ -52,6 +51,8 @@ const Todo = () => {
           setActiveList={setActiveList}
           rename={rename}
           setRename={setRename}
+          showOptions={showOptions}
+          setShowOptions={setShowOptions}
         />
       </Wrapper>
       )}

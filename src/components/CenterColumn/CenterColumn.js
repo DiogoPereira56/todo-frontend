@@ -16,9 +16,11 @@ import Tasks from './Tasks'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup';
 
-const CenterColumn = ({ lists, activeList, setChangeLayout, changeLayout, refetch, setActiveList, rename, setRename}) => {
+const CenterColumn = ({ 
+    lists, activeList, setChangeLayout, changeLayout, refetch, 
+    setActiveList, rename, setRename, showOptions, setShowOptions
+}) => {
 
-    const [showOptions, setShowOptions] = useState(false);
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
@@ -256,7 +258,9 @@ const CenterColumn = ({ lists, activeList, setChangeLayout, changeLayout, refetc
         refetch: PropTypes.func,
         setActiveList: PropTypes.func,
         setRename: PropTypes.func,
-        rename: PropTypes.bool
+        rename: PropTypes.bool,
+        showOptions: PropTypes.bool,
+        setShowOptions: PropTypes.func
     }
     
     export default CenterColumn;

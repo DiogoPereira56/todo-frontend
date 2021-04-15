@@ -53,4 +53,23 @@ const Input = styled.input`
 const Ul = styled.ul`
     margin-bottom: 20px;
 `
-export {Wrapper, SideBar2, H2, Img, Li, P, Input, Ul};
+const PaginationWrapper = styled.div`
+    display: flex;
+    margin: 7px;
+`
+
+const Paginnation = styled.div`
+    margin-left: 3px;
+    margin-right: 3px;
+    width:20px;
+    text-align: center;
+    border: solid black 1px;
+
+    cursor: pointer;
+
+    &:hover{
+        background: rgb(248, 248, 248);
+    }
+`
+
+export {Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationWrapper, Paginnation};

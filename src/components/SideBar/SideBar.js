@@ -10,12 +10,21 @@ import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
 import { PropTypes } from 'prop-types'
 import { useEffect, useState } from 'react';
 import { array } from 'yup/lib/locale';
+import Pagination from './Pagination';
 
-const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename }) => {
+const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, setShowOptions }) => {
     
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
     //todo: try and change 'refetch', to 'cache'
     //const {error, loading, data, refetch} = useQuery(GET_ALL_LISTS);
+
+    //Pagination States
+    const [currentPage, setCurrentPage] = useState(1);
+    const [listsPerPage, setListsPerPage] = useState(5);
+
+    const indexOfLastList = currentPage * listsPerPage;
+    const indexOfFirstList = indexOfLastList - listsPerPage;
+    const currentShownLists = lists.slice(indexOfFirstList, indexOfLastList);
 
     useEffect(() => {
         if(lists)
@@ -59,10 +68,11 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename }) 
                 </Ul>
 
                 <ListOfTasks 
-                    lists={lists} 
+                    lists={currentShownLists} 
                     setActiveList={setActiveList}
                     setChangeLayout={setChangeLayout}
                     setRename={setRename}
+                    setShowOptions={setShowOptions}
                 />
                 
                 <Formik
@@ -76,6 +86,8 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename }) 
                         </Form>
                     )}
                 </Formik>
+
+                <Pagination listsPerPage={listsPerPage} totalLists={lists.length} setCurrentPage={setCurrentPage} />
                 
             </SideBar2>
         </Wrapper>
@@ -88,7 +100,8 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename }) 
         setActiveList: PropTypes.func,
         lista: PropTypes.object,
         setChangeLayout: PropTypes.func,
-        setRename: PropTypes.func
+        setRename: PropTypes.func,
+        setShowOptions: PropTypes.func
     }
     
     export default SideBar;
