@@ -59,7 +59,10 @@ const CenterColumn = ({ lists, activeList, setChangeLayout, changeLayout, refetc
     }
 
     const removeList = () => {
-        deleteList({variables: activeList.idList })
+        const { idList, idClient } = activeList 
+        const list = { idList, idClient }
+        
+        deleteList({variables: list })
         .then(data => {
             if (!data.data) {
                 console.log('something went wrong');
@@ -68,12 +71,13 @@ const CenterColumn = ({ lists, activeList, setChangeLayout, changeLayout, refetc
                 console.log(data.data);
                 refetch();
                 setActiveList(lists[0]);
+                setShowOptions(false);
             }
         });
     }
 
     const handleRename = (values) => {
-        const newValue = {idList: activeList.idList, title: values.listName}
+        const newValue = {idList: activeList.idList, title: values.listName, idClient: activeList.idClient}
         newName({variables: newValue })
         .then(data => {
             if (data.data.updateList) {
@@ -88,8 +92,9 @@ const CenterColumn = ({ lists, activeList, setChangeLayout, changeLayout, refetc
     }
 
     const handleNewTask = (values) => {
-        const {idList} = activeList 
-        const task = { title: values.title, idList }
+        const {idList, idClient} = activeList 
+        const task = { title: values.title, idList, idClient }
+        /* console.log(task); */
         newTask({variables: task })
         .then(data => {
             if (!data.data) {
@@ -105,13 +110,27 @@ const CenterColumn = ({ lists, activeList, setChangeLayout, changeLayout, refetc
 
     const handleNewDescription = (values) => {
         const {idTask} = activeTask 
-        const task = { idTask: idTask, description: values.description }
+        const {idClient} = activeList
+        const task = { idTask: idTask, description: values.description, idClient: idClient }
         updateDescription({variables: task})
     }
 
     const handleDeleteTask = () => {
-        doDeleteTask({variables: activeTask.idTask})
-        refetch();
+        const {idTask} = activeTask;
+        const {idClient} = activeList;
+        const task = {idTask, idClient}
+        doDeleteTask({variables: task})
+        .then(data => {
+            if (!data.data) {
+                console.log('something went wrong');
+            }
+            else{
+                console.log(data.data);
+                refetch();
+                setChangeLayout(false);
+            }
+        });
+        
     }
 
     const doRename = () => {

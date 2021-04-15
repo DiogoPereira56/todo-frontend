@@ -59,6 +59,7 @@ const LoginForm = () => {
       .required('Email is Required'),
     password: Yup.string()
       .min(6, 'Password must be at least 6 characters')
+      .max(12, 'Password must be at most 12 characters')
       .required('Password is Required'),
   })
 
@@ -71,6 +72,7 @@ const LoginForm = () => {
       .required('A Name is required'),
     password: Yup.string()
       .min(6, 'Password must be at least 6 characters')
+      .max(12, 'Password must be at most 12 characters')
       .required('Password is Required'),
   })
 

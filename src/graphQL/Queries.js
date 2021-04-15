@@ -32,6 +32,7 @@ export const GET_CLIENT_INFORMATION = gql`
     name
     lists{
       idList
+      idClient
       listName
       tasks{
         idTask

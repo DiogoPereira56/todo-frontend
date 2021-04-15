@@ -34,14 +34,22 @@ export const NEW_LIST_MUTATION = gql`
 `;
 
 export const DELETE_LIST_MUTATION = gql`
-  mutation ($idList: Float!){
-    removeList(idList:$idList)
+  mutation ($idList: Float!, $idClient: Float!){
+    removeList(idList:$idList, idClient: $idClient)
   }
 `
 
 export const RENAME_LIST_MUTATION = gql`
-  mutation newList($idList: Float!, $title: String!){
-    updateList(idList:$idList, title:$title){
+  mutation newList(
+  $idList: Float!, 
+  $title: String!, 
+  $idClient: Float!
+  ){
+    updateList(
+      idList:$idList, 
+      title:$title, 
+      idClient:$idClient
+    ){
       idList
       listName
       tasks{
@@ -56,8 +64,16 @@ export const RENAME_LIST_MUTATION = gql`
 
 //Task Actions
 export const NEW_TASK_MUTATION = gql`
-  mutation newTask($title: String!, $idList: Float!){
-    addTask(title: $title, idList: $idList){
+  mutation newTask(
+    $title: String!, 
+    $idList: Float!,
+    $idClient: Float!,
+  ){
+    addTask(
+      title: $title, 
+      idList: $idList, 
+      idClient: $idClient
+    ){
       idTask
       idList
       title
@@ -68,17 +84,22 @@ export const NEW_TASK_MUTATION = gql`
 `
 
 export const DELETE_TASK_MUTATION = gql`
-  mutation ($idTask: Float!){
-    removeTask(idTask: $idTask)
+  mutation ($idTask: Float!, $idClient: Float!){
+    removeTask(idTask: $idTask, idClient: $idClient)
   }
 `
 
 export const UPDATE_TASK_DESCRIPTION_MUTATION = gql`
-  mutation ($idTask: Float!, $description: String!){
+  mutation (
+    $idTask: Float!, 
+    $description: String!, 
+    $idClient: Float!
+  ){
     updateTaskDescription(
       idTask: $idTask, 
-      description: $description)
-    {
+      description: $description,
+    	idClient: $idClient
+    ){
       idTask
       idList
       title
@@ -89,11 +110,16 @@ export const UPDATE_TASK_DESCRIPTION_MUTATION = gql`
 `
 
 export const UPDATE_TASK_COMPLETION_MUTATION = gql`
-  mutation ($idTask: Float!, $complete: Boolean!){
+  mutation (
+    $idTask: Float!, 
+    $complete: Boolean!, 
+    $idClient: Float!
+	){
     updateTaskCompletion(
       idTask: $idTask, 
-      complete: $complete)
-    {
+      complete: $complete,
+      idClient: $idClient
+    ){
       idTask
       idList
       title
