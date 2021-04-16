@@ -15,6 +15,7 @@ import { DELETE_LIST_MUTATION, NEW_TASK_MUTATION, RENAME_LIST_MUTATION,
 import Tasks from './Tasks'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup';
+import Pagination from '../Pagination'
 
 const CenterColumn = ({ 
     lists, activeList, setChangeLayout, changeLayout, refetch, 
@@ -55,6 +56,18 @@ const CenterColumn = ({
           });
         }
     }); */
+
+    //Pagination States
+    const [currentPage, setCurrentPage] = useState(1);
+    const [tasksPerPage] = useState(11);
+
+    const indexOfLastTask = currentPage * tasksPerPage;
+    const indexOfFirstTask = indexOfLastTask - tasksPerPage;
+    var currentShownTasks;
+    if(activeList){
+        currentShownTasks = activeList.tasks.slice(indexOfFirstTask, indexOfLastTask);
+        //console.log(currentShownTasks)
+    }
 
     if(errorDelete){
         return <div>{errorDelete}</div>
@@ -191,6 +204,7 @@ const CenterColumn = ({
                                 </Options>
                             )}
                         </TasksToolbarTitleItem>
+                        {activeList && (<Pagination listsPerPage={tasksPerPage} totalLists={activeList.tasks.length} setCurrentPage={setCurrentPage} />)}
                     </TasksToolbarTitleContainer>
                     
                     {changeLayout &&(
@@ -224,7 +238,14 @@ const CenterColumn = ({
                     </Formik>
                 </BaseAdd>
                 
-                {listIsActive && (<Tasks list={activeList} setChangeLayout={setChangeLayout} setActiveTask={setActiveTask} /> )}
+                {listIsActive && (
+                    <Tasks 
+                        list={activeList} 
+                        setChangeLayout={setChangeLayout} 
+                        setActiveTask={setActiveTask} 
+                        tasks={currentShownTasks} 
+                    />
+                )}
 
             </CenterBar>
 

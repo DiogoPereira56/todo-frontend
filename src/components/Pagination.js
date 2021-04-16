@@ -1,12 +1,19 @@
 import { PropTypes } from 'prop-types'
-import { PaginationWrapper, Paginnation } from './SideBar.styles'
+import { useEffect, useState } from 'react';
+import { PaginationWrapper, Paginnation } from './SideBar/SideBar.styles'
 
 const Pagination = ({ listsPerPage, totalLists, setCurrentPage }) => {
-    const pageNumbers = [];
+    const [pageNumbers, setPageNumbers] = useState([1]);
+    const temp = [];
 
-    for (let i = 1; i <= Math.ceil(totalLists / listsPerPage); i++){
-        pageNumbers.push(i);
-    }
+    useEffect(() => {
+        for (let i = 1; i <= Math.ceil(totalLists / listsPerPage); i++){
+            temp.push(i);
+            setPageNumbers(temp);
+        }
+    }, [totalLists])
+
+    
 
     return (
         <nav>

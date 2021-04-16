@@ -10,7 +10,7 @@ import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
 import { PropTypes } from 'prop-types'
 import { useEffect, useState } from 'react';
 import { array } from 'yup/lib/locale';
-import Pagination from './Pagination';
+import Pagination from '../Pagination';
 
 const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, setShowOptions }) => {
     

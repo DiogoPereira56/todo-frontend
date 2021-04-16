@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { UPDATE_TASK_COMPLETION_MUTATION } from '../../graphQL/Mutations';
 import { Task, CheckBox } from './CenterColumn.styles'
 
-const Tasks = ( { list, setChangeLayout, setActiveTask } ) => {
+const Tasks = ( { list, setChangeLayout, setActiveTask, tasks } ) => {
 
   const [updateCompletion] = useMutation(UPDATE_TASK_COMPLETION_MUTATION);
 
@@ -20,7 +20,7 @@ const Tasks = ( { list, setChangeLayout, setActiveTask } ) => {
   if(list){
     return (
         <div>
-        { list.tasks.map(task => (
+        { tasks.map(task => (
             <Task key={task.idTask} onClick={() => show(task)}>
                 <CheckBox type="checkbox" defaultChecked={task.complete}  onClick={() => handleCompletedTask(task)}/>{ task.title }
             </Task>
@@ -35,7 +35,8 @@ const Tasks = ( { list, setChangeLayout, setActiveTask } ) => {
 Tasks.propTypes = {
     list: PropTypes.object,
     setChangeLayout: PropTypes.func,
-    setActiveTask: PropTypes.func
+    setActiveTask: PropTypes.func,
+    tasks: PropTypes.array
 };
 
 export default Tasks;
