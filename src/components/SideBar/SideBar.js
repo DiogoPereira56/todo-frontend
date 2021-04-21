@@ -1,35 +1,40 @@
 import {Wrapper, SideBar2, H2, Img, Li, P, Input, Ul} from './SideBar.styles'
 import '../../fonts.css'
 import menu from '../../imgs/menu.png'
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { GET_ALL_LISTS } from '../../graphQL/Queries';
 import ListOfTasks from './ListOfTasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
+import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION, LIST_INFO_MUTATION } from '../../graphQL/Mutations';
+import { GET_CLIENT_LISTS, GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
 import { PropTypes } from 'prop-types'
 import { useEffect, useState } from 'react';
 import { array } from 'yup/lib/locale';
 import Pagination from '../Pagination';
 
-const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, setShowOptions }) => {
+const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, 
+    setShowOptions, setCurrentPage, currentPage, listsPerPage, setPaginatedLists }) => {
     
+    const { data: totalLists} = useQuery(GET_CLIENT_TOTAL_LISTS);
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
+    const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
     //todo: try and change 'refetch', to 'cache'
     //const {error, loading, data, refetch} = useQuery(GET_ALL_LISTS);
 
-    //Pagination States
-    const [currentPage, setCurrentPage] = useState(1);
-    const [listsPerPage, setListsPerPage] = useState(5);
+    function changePaginatedLists() {
 
-    const indexOfLastList = currentPage * listsPerPage;
-    const indexOfFirstList = indexOfLastList - listsPerPage;
-    const currentShownLists = lists.slice(indexOfFirstList, indexOfLastList);
-
-    useEffect(() => {
-        if(lists)
-            setActiveList(lists[0]);
-    }, [])
+        const offset = listsPerPage * (currentPage - 1);
+        getClientLists({variables: {limit: listsPerPage, offset: offset}})
+        .then( data => {
+            if (!data.data) {
+                console.log('something went wrong');
+            } else{
+                //console.log(data.data.getClientInformations.list)
+                setPaginatedLists(data.data.getClientInformations.list);
+            }
+        })
+    }
 
     const handleNewList = (values) => {
         makeNewList({variables: values })
@@ -39,8 +44,9 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, se
             }
             else
             console.log(data.data);
+            changePaginatedLists();
         });
-        refetch();
+        //refetch();
         values.listName = '';
     
     }
@@ -67,13 +73,14 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, se
                     <Li><P>Tasks</P></Li>
                 </Ul>
 
-                <ListOfTasks 
-                    lists={currentShownLists} 
-                    setActiveList={setActiveList}
-                    setChangeLayout={setChangeLayout}
-                    setRename={setRename}
-                    setShowOptions={setShowOptions}
-                />
+                    {lists && (
+                    <ListOfTasks 
+                        lists={lists} 
+                        setActiveList={setActiveList}
+                        setChangeLayout={setChangeLayout}
+                        setRename={setRename}
+                        setShowOptions={setShowOptions}
+                    />)}
                 
                 <Formik
                     initialValues={{ listName: '' }}
@@ -87,7 +94,13 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, se
                     )}
                 </Formik>
 
-                <Pagination listsPerPage={listsPerPage} totalLists={lists.length} setCurrentPage={setCurrentPage} />
+                {/* console.log(totalLists) */}
+                {totalLists && (
+                <Pagination 
+                    listsPerPage={listsPerPage} 
+                    totalLists={totalLists.getClientTotalLists} 
+                    setCurrentPage={setCurrentPage} 
+                />)}
                 
             </SideBar2>
         </Wrapper>
@@ -101,7 +114,11 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, se
         lista: PropTypes.object,
         setChangeLayout: PropTypes.func,
         setRename: PropTypes.func,
-        setShowOptions: PropTypes.func
+        setShowOptions: PropTypes.func,
+        setCurrentPage: PropTypes.func,
+        currentPage: PropTypes.number,
+        listsPerPage: PropTypes.number,
+        setPaginatedLists: PropTypes.func
     }
     
     export default SideBar;

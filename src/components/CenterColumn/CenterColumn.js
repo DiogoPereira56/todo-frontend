@@ -11,19 +11,20 @@ import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types'
 import { useMutation, useQuery } from '@apollo/client'
 import { DELETE_LIST_MUTATION, NEW_TASK_MUTATION, RENAME_LIST_MUTATION, 
-    UPDATE_TASK_DESCRIPTION_MUTATION, DELETE_TASK_MUTATION } from '../../graphQL/Mutations'
+    UPDATE_TASK_DESCRIPTION_MUTATION, DELETE_TASK_MUTATION, LIST_TOTAL_TASK_MUTATION, LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION } from '../../graphQL/Mutations'
 import Tasks from './Tasks'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup';
 import Pagination from '../Pagination'
 
 const CenterColumn = ({ 
-    lists, activeList, setChangeLayout, changeLayout, refetch, 
-    setActiveList, rename, setRename, showOptions, setShowOptions
+    lists, activeList, setChangeLayout, changeLayout, refetch, setActiveList,
+    rename, setRename, showOptions, setShowOptions, setPaginatedLists
 }) => {
 
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
+    const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
     const [newTask, { error: errorTask }] = useMutation(NEW_TASK_MUTATION);
@@ -58,16 +59,78 @@ const CenterColumn = ({
     }); */
 
     //Pagination States
-    const [currentPage, setCurrentPage] = useState(1);
+    const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
+    const [getListTasks] = useMutation(LIST_INFO_MUTATION);
+    const [currentTaskPage, setTaskCurrentPage] = useState(1);
     const [tasksPerPage] = useState(11);
+    const [totalTasks, setTotalTasks] = useState(1);
+    const [listsPerPage] = useState(5);
 
-    const indexOfLastTask = currentPage * tasksPerPage;
-    const indexOfFirstTask = indexOfLastTask - tasksPerPage;
-    var currentShownTasks;
-    if(activeList){
-        currentShownTasks = activeList.tasks.slice(indexOfFirstTask, indexOfLastTask);
-        //console.log(currentShownTasks)
+    function paginatedTasks() {
+        const {idList, idClient} = activeList;
+        const offset = tasksPerPage * (currentTaskPage - 1);
+        getListTasks({variables: { idList: idList, idClient: idClient, limit: tasksPerPage, offset: offset }})
+          .then( data => {
+              if(data.data){
+                  //leak
+                  //setActiveList(data.data.getList);
+                  //console.log(data.data.getList);
+              }
+          })
     }
+
+    function changePaginatedLists() {
+        //const offset = listsPerPage * (currentPage - 1);
+        getClientLists({variables: {limit: listsPerPage, offset: 0}})
+        .then( data => {
+            if (!data.data) {
+                console.log('something went wrong');
+            } else{
+                setPaginatedLists(data.data.getClientInformations.list);
+                getListTasks({variables: {
+                    idList: data.data.getClientInformations.list[0].idList,
+                    idClient: data.data.getClientInformations.list[0].idClient,
+                    limit: tasksPerPage,
+                    offset: 0
+                    }})
+                    .then( data => {
+                        if(data.data){
+                            setActiveList(data.data.getList);
+                            //console.log(data.data.getList);
+                        }
+                    })
+            }
+        })
+        //setCurrentPage(1);
+    }
+
+    useEffect(() => {
+        //there was a error Leak Here
+        /* if(activeList){
+            paginatedTasks();
+        } */
+
+    }, [currentTaskPage])
+    //console.log(currentPage);
+
+    function changeTotalTasks() {
+        const {idList, idClient} = activeList
+        const values = { idList: idList, idClient: idClient }
+        getTotalTasks({variables: values })
+        .then(data => {
+            //console.log(data.data);
+            setTotalTasks(data.data);
+        })
+    }
+
+    useEffect(() => {
+        if(activeList){
+            setListIsActive(true);
+            changeTotalTasks();
+            paginatedTasks();
+        }
+
+    }, [activeList])
 
     if(errorDelete){
         return <div>{errorDelete}</div>
@@ -83,21 +146,20 @@ const CenterColumn = ({
                 console.log('something went wrong');
             }
             else{
-                console.log(data.data);
-                refetch();
-                setActiveList(lists[0]);
+                changePaginatedLists();
                 setShowOptions(false);
             }
         });
+        console.log(lists);
     }
 
     const handleRename = (values) => {
-        const newValue = {idList: activeList.idList, title: values.listName, idClient: activeList.idClient}
+        const newValue = {idList: activeList.idList, title: values.listName, idClient: activeList.idClient, limit: tasksPerPage, offset:0}
         newName({variables: newValue })
         .then(data => {
             if (data.data.updateList) {
-                refetch();
-                setActiveList(data.data.updateList);
+                //setActiveList(data.data.updateList);
+                changePaginatedLists();
             }
             else{
                 console.log('something went wrong');
@@ -115,9 +177,10 @@ const CenterColumn = ({
             if (!data.data) {
                 console.log('something went wrong');
             }
-            else
+            else{
                 console.log(data.data);
-            refetch();
+                paginatedTasks();
+            }
         });
         
         values.title = '';
@@ -128,6 +191,7 @@ const CenterColumn = ({
         const {idClient} = activeList
         const task = { idTask: idTask, description: values.description, idClient: idClient }
         updateDescription({variables: task})
+        paginatedTasks();
     }
 
     const handleDeleteTask = () => {
@@ -141,7 +205,7 @@ const CenterColumn = ({
             }
             else{
                 console.log(data.data);
-                refetch();
+                //refetch();
                 setChangeLayout(false);
             }
         });
@@ -152,13 +216,6 @@ const CenterColumn = ({
         setShowOptions(false)
         setRename(!rename)
     }
-
-    useEffect(() => {
-        if(activeList){
-            setListIsActive(true);
-        }
-
-    }, [activeList])
     
     const validateNewTask = Yup.object({
         title: Yup.string()
@@ -174,7 +231,7 @@ const CenterColumn = ({
         description: Yup.string()
           .required('A Name is Required'),
     })
-
+    
     return (
         <Wrapper>
             <CenterBar>
@@ -204,7 +261,9 @@ const CenterColumn = ({
                                 </Options>
                             )}
                         </TasksToolbarTitleItem>
-                        {activeList && (<Pagination listsPerPage={tasksPerPage} totalLists={activeList.tasks.length} setCurrentPage={setCurrentPage} />)}
+                        
+                        {activeList && (<Pagination listsPerPage={tasksPerPage} totalLists={totalTasks.getListsTotalTasks} setCurrentPage={setTaskCurrentPage} />)}
+                    
                     </TasksToolbarTitleContainer>
                     
                     {changeLayout &&(
@@ -238,12 +297,12 @@ const CenterColumn = ({
                     </Formik>
                 </BaseAdd>
                 
+                {/* console.log(activeList) */}
                 {listIsActive && (
                     <Tasks 
-                        list={activeList} 
-                        setChangeLayout={setChangeLayout} 
-                        setActiveTask={setActiveTask} 
-                        tasks={currentShownTasks} 
+                        list={activeList}
+                        setChangeLayout={setChangeLayout}
+                        setActiveTask={setActiveTask}
                     />
                 )}
 
@@ -281,7 +340,8 @@ const CenterColumn = ({
         setRename: PropTypes.func,
         rename: PropTypes.bool,
         showOptions: PropTypes.bool,
-        setShowOptions: PropTypes.func
+        setShowOptions: PropTypes.func,
+        setPaginatedLists: PropTypes.func
     }
     
     export default CenterColumn;

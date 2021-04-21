@@ -44,3 +44,9 @@ export const GET_CLIENT_INFORMATION = gql`
   }
 }
 `
+
+export const GET_CLIENT_TOTAL_LISTS = gql`
+  {
+    getClientTotalLists
+  }
+`

@@ -24,6 +24,19 @@ export const REGISTER_USER_MUTATION = gql`
   }
 `;
 
+export const CLIENT_LISTS_MUTATION = gql`
+mutation getClient($limit: Float!, $offset: Float!){
+  getClientInformations{
+    name
+    list(limit: $limit, offset: $offset){
+      idList
+      idClient
+      listName
+    }
+  }
+}
+`
+
 //List actions
 export const NEW_LIST_MUTATION = gql`
   mutation addNewList($listName: String!){
@@ -41,9 +54,11 @@ export const DELETE_LIST_MUTATION = gql`
 
 export const RENAME_LIST_MUTATION = gql`
   mutation newList(
-  $idList: Float!, 
-  $title: String!, 
-  $idClient: Float!
+    $idList: Float!, 
+    $title: String!, 
+    $idClient: Float!,
+  	$limit: Float!, 
+  	$offset: Float!
   ){
     updateList(
       idList:$idList, 
@@ -52,7 +67,28 @@ export const RENAME_LIST_MUTATION = gql`
     ){
       idList
       listName
-      tasks{
+      taskss(limit: $limit, offset: $offset){
+        idTask
+        title
+        complete
+        description
+      }
+    }
+  }
+`
+
+export const LIST_INFO_MUTATION = gql`
+  mutation getListInfo(
+    $idList: Float!,
+    $idClient: Float!,
+    $limit: Float!, 
+    $offset: Float!
+    ){
+    getList(idList: $idList, idClient: $idClient){
+      idList
+      idClient
+      listName
+      taskss(limit: $limit, offset: $offset){
         idTask
         title
         complete
@@ -126,5 +162,14 @@ export const UPDATE_TASK_COMPLETION_MUTATION = gql`
       complete
       description
     }
+  }
+`
+
+export const LIST_TOTAL_TASK_MUTATION = gql`
+  mutation listTotalTasks(
+    $idList: Float!, 
+    $idClient: Float!
+  ){
+    getListsTotalTasks(idList: $idList, idClient: $idClient)
   }
 `
