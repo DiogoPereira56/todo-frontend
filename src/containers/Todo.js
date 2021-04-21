@@ -4,7 +4,7 @@ import CenterColumn from '../components/CenterColumn/CenterColumn.js';
 import SideBar from '../components/SideBar/SideBar.js';
 import TopNavbar from '../components/TopNavbar/TopNavbar.js';
 import { useMutation, useQuery } from '@apollo/client';
-import { DECODED_TOKEN, GET_CLIENT_INFORMATION } from '../graphQL/Queries';
+import { GET_CLIENT_INFORMATION } from '../graphQL/Queries';
 import { useEffect, useState } from 'react';
 import { CLIENT_LISTS_MUTATION, LIST_INFO_MUTATION } from '../graphQL/Mutations';
 
@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 
 const Todo = () => {
   //Queries
-  const {error: errorAuth, loading: loadingAuth, data: dataClient, refetch} = useQuery(GET_CLIENT_INFORMATION);
+  const {error: errorAuth, loading: loadingAuth, data: dataClient} = useQuery(GET_CLIENT_INFORMATION);
   //Mutations
   const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
   const [getListTasks] = useMutation(LIST_INFO_MUTATION);
@@ -32,7 +32,7 @@ const Todo = () => {
   const [showAllTasks, setShowAllTasks] = useState(false);
   //Paginated states
   const [currentPage, setCurrentPage] = useState(1);
-  const [listsPerPage, setListsPerPage] = useState(5);
+  const [listsPerPage] = useState(5);
   const [paginatedLists, setPaginatedLists] = useState();
   //Other States 
   const [loggedIdClient, setLoggedIdClient] = useState();
@@ -75,8 +75,7 @@ const Todo = () => {
       {dataClient && ( 
       <Wrapper>
         <SideBar 
-          lists={paginatedLists} 
-          refetch={refetch} 
+          lists={paginatedLists}
           setActiveList={setActiveList}
           setChangeLayout={setChangeLayout}
           setRename={setRename}
@@ -93,7 +92,6 @@ const Todo = () => {
           activeList={activeList}
           changeLayout={changeLayout}
           setChangeLayout={setChangeLayout}
-          refetch={refetch}
           setActiveList={setActiveList}
           rename={rename}
           setRename={setRename}

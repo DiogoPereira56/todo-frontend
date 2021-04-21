@@ -1,19 +1,16 @@
 import {Wrapper, SideBar2, H2, Img, Li, P, Input, Ul} from './SideBar.styles'
 import '../../fonts.css'
 import menu from '../../imgs/menu.png'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { GET_ALL_LISTS } from '../../graphQL/Queries';
+import { useMutation, useQuery } from '@apollo/client';
 import ListOfTasks from './ListOfTasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION, LIST_INFO_MUTATION } from '../../graphQL/Mutations';
-import { GET_CLIENT_LISTS, GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
+import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION } from '../../graphQL/Mutations';
+import { GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
 import { PropTypes } from 'prop-types'
-import { useEffect, useState } from 'react';
-import { array } from 'yup/lib/locale';
 import Pagination from '../Pagination';
 
-const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, 
+const SideBar = ({ lists, setActiveList, setChangeLayout, setRename, 
     setShowOptions, setCurrentPage, currentPage, listsPerPage, setPaginatedLists, setShowAllTasks }) => {
     
     const { data: totalLists} = useQuery(GET_CLIENT_TOTAL_LISTS);
@@ -88,7 +85,7 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename,
                     validationSchema={validateNewList}
                     onSubmit={(handleNewList)}
                     >
-                    {({values, errors}) => (
+                    {() => (
                         <Form>
                             <Field placeholder=" +  New List" autoComplete="off" name="listName" as={Input} /><br/>
                         </Form>
@@ -110,7 +107,6 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename,
 
     SideBar.propTypes = {
         lists: PropTypes.array,
-        refetch: PropTypes.func,
         setActiveList: PropTypes.func,
         lista: PropTypes.object,
         setChangeLayout: PropTypes.func,

@@ -1,6 +1,5 @@
 import { useMutation } from '@apollo/client';
 import { PropTypes } from 'prop-types'
-import { useEffect } from 'react';
 import { LIST_INFO_MUTATION } from '../../graphQL/Mutations';
 import { Li, P } from './SideBar.styles'
 

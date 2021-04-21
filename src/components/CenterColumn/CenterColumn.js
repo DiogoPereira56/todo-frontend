@@ -1,5 +1,5 @@
 import {CenterBar, TasksToolbar, TasksToolbarTitleContainer, TasksToolbarTitleItem, H2, 
-    Img, TaskToolbarRight, Button, BaseAdd, Add, Input, Task, CheckBox, ChangeTask,
+    Img, TaskToolbarRight, Button, BaseAdd, Add, Input,
     DescriptionContainer, Description, Wrapper, Hide, Options, Actions, ListInput} from './CenterColumn.styles'
 import {Warnning} from '../Login/LoginForm.style'
 import '../../fonts.css'
@@ -20,7 +20,7 @@ import Pagination from '../Pagination'
 import { GET_CLIENT_TOTAL_TASKS } from '../../graphQL/Queries'
 
 const CenterColumn = ({ 
-    lists, activeList, setChangeLayout, changeLayout, refetch, setActiveList, rename, setRename, 
+    lists, activeList, setChangeLayout, changeLayout, setActiveList, rename, setRename, 
     showOptions, setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient
 }) => {
 
@@ -29,9 +29,9 @@ const CenterColumn = ({
     const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
-    const [newTask, { error: errorTask }] = useMutation(NEW_TASK_MUTATION);
+    const [newTask] = useMutation(NEW_TASK_MUTATION);
     const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION);
-    const [newName, {error: errorRename}] = useMutation(RENAME_LIST_MUTATION);
+    const [newName] = useMutation(RENAME_LIST_MUTATION);
     /** failed atempt at using cache */
     /* const [newName2] = useMutation(RENAME_LIST_MUTATION, {
         update(cache, { data: { newName } }) {
@@ -272,7 +272,7 @@ const CenterColumn = ({
                             validationSchema={validateRename}
                             onSubmit={(handleRename)}
                             >
-                            {({values, errors}) => (
+                            {() => (
                                 <Form>
                                     <Field placeholder="" autoComplete="off" name="listName" as={ListInput} /><br/>
                                 </Form>
@@ -320,7 +320,7 @@ const CenterColumn = ({
                         validationSchema={validateNewTask}
                         onSubmit={(handleNewTask)}
                         >
-                        {({values, errors}) => (
+                        {() => (
                             <Form>
                                 <Field placeholder="Add a Task" autoComplete="off" name="title" as={Input} /><br/>
                             </Form>
@@ -357,7 +357,9 @@ const CenterColumn = ({
                         validationSchema={validateNewDescription}
                         onSubmit={(handleNewDescription)}
                         >
-                        {({values, errors}) => (
+
+                        
+                        {() => (
                             <Form>
                                 <Field placeholder="Add a Description" autoComplete="off" name="description" as={Description} /><br/>
                             </Form>
@@ -376,7 +378,6 @@ const CenterColumn = ({
         activeList: PropTypes.object,
         setChangeLayout: PropTypes.func,
         changeLayout: PropTypes.bool,
-        refetch: PropTypes.func,
         setActiveList: PropTypes.func,
         setRename: PropTypes.func,
         rename: PropTypes.bool,
