@@ -11,9 +11,7 @@ const Pagination = ({ listsPerPage, totalLists, setCurrentPage }) => {
             temp.push(i);
             setPageNumbers(temp);
         }
-    }, [totalLists])
-
-    
+    }, [totalLists])    
 
     return (
         <nav>

@@ -14,7 +14,7 @@ import { array } from 'yup/lib/locale';
 import Pagination from '../Pagination';
 
 const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename, 
-    setShowOptions, setCurrentPage, currentPage, listsPerPage, setPaginatedLists }) => {
+    setShowOptions, setCurrentPage, currentPage, listsPerPage, setPaginatedLists, setShowAllTasks }) => {
     
     const { data: totalLists} = useQuery(GET_CLIENT_TOTAL_LISTS);
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
@@ -70,7 +70,7 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename,
                     <Li><P>Planned</P></Li>
                     <Li><P>Assigned to you</P></Li>
                     <Li><P>Flagged email</P></Li>
-                    <Li><P>Tasks</P></Li>
+                    <Li onClick={() => setShowAllTasks(true)}><P>All Tasks</P></Li>
                 </Ul>
 
                     {lists && (
@@ -80,6 +80,7 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename,
                         setChangeLayout={setChangeLayout}
                         setRename={setRename}
                         setShowOptions={setShowOptions}
+                        setShowAllTasks={setShowAllTasks}
                     />)}
                 
                 <Formik
@@ -118,7 +119,8 @@ const SideBar = ({ lists, refetch, setActiveList, setChangeLayout, setRename,
         setCurrentPage: PropTypes.func,
         currentPage: PropTypes.number,
         listsPerPage: PropTypes.number,
-        setPaginatedLists: PropTypes.func
+        setPaginatedLists: PropTypes.func,
+        setShowAllTasks: PropTypes.func
     }
     
     export default SideBar;

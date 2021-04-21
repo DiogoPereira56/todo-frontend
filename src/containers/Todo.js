@@ -29,35 +29,38 @@ const Todo = () => {
   const [rename, setRename] = useState(false);
   const [changeLayout, setChangeLayout] = useState(false);
   const [activeList, setActiveList] = useState();
+  const [showAllTasks, setShowAllTasks] = useState(false);
   //Paginated states
   const [currentPage, setCurrentPage] = useState(1);
   const [listsPerPage, setListsPerPage] = useState(5);
   const [paginatedLists, setPaginatedLists] = useState();
+  //Other States 
+  const [loggedIdClient, setLoggedIdClient] = useState();
 
-    function changePaginatedLists() {
-
-        const offset = listsPerPage * (currentPage - 1);
-        getClientLists({variables: {limit: listsPerPage, offset: offset}})
-        .then( data => {
-            if (!data.data) {
-                console.log('something went wrong');
-            } else{
-                setPaginatedLists(data.data.getClientInformations.list);
-                getListTasks({variables: {
-                    idList: data.data.getClientInformations.list[0].idList,
-                    idClient: data.data.getClientInformations.list[0].idClient,
-                    limit: 11,
-                    offset: 0
-                    }})
-                    .then( data => {
-                        if(data.data){
-                            setActiveList(data.data.getList);
-                            //console.log(data.data.getList);
-                        }
-                    })
-            }
-        })
-    }
+  function changePaginatedLists() {
+    const offset = listsPerPage * (currentPage - 1);
+    getClientLists({variables: {limit: listsPerPage, offset: offset}})
+    .then( data => {
+        if (!data.data) {
+            console.log('something went wrong');
+        } else{
+            setPaginatedLists(data.data.getClientInformations.list);
+            setLoggedIdClient(data.data.getClientInformations.list[0].idClient)
+            getListTasks({variables: {
+                idList: data.data.getClientInformations.list[0].idList,
+                idClient: data.data.getClientInformations.list[0].idClient,
+                limit: 11,
+                offset: 0
+                }})
+                .then( data => {
+                    if(data.data){
+                        setActiveList(data.data.getList);
+                        //console.log(data.data.getList);
+                    }
+                })
+        }
+    })
+  }
 
     useEffect(() => {
       changePaginatedLists();
@@ -82,6 +85,7 @@ const Todo = () => {
           currentPage={currentPage}
           listsPerPage={listsPerPage}
           setPaginatedLists={setPaginatedLists}
+          setShowAllTasks={setShowAllTasks}
         />
         
         <CenterColumn 
@@ -96,6 +100,8 @@ const Todo = () => {
           showOptions={showOptions}
           setShowOptions={setShowOptions}
           setPaginatedLists={setPaginatedLists}
+          showAllTasks={showAllTasks}
+          loggedIdClient={loggedIdClient}
         />
       </Wrapper>
       )}

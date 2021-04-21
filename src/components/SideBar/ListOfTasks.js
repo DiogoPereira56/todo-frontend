@@ -4,11 +4,12 @@ import { useEffect } from 'react';
 import { LIST_INFO_MUTATION } from '../../graphQL/Mutations';
 import { Li, P } from './SideBar.styles'
 
-const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename, setShowOptions }) => {
+const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename, setShowOptions, setShowAllTasks }) => {
 
   const [getListTasks] = useMutation(LIST_INFO_MUTATION);
 
   function changeActiveList(list) {
+    setShowAllTasks(false)
     getListTasks({variables: {
       idList: list.idList,
       idClient: list.idClient,
@@ -47,7 +48,8 @@ ListOfTasks.propTypes = {
   setActiveList: PropTypes.func,
   setChangeLayout: PropTypes.func,
   setRename: PropTypes.func,
-  setShowOptions: PropTypes.func
+  setShowOptions: PropTypes.func,
+  setShowAllTasks: PropTypes.func
 };
 
 export default ListOfTasks;

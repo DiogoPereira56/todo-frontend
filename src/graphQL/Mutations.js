@@ -28,6 +28,7 @@ export const CLIENT_LISTS_MUTATION = gql`
 mutation getClient($limit: Float!, $offset: Float!){
   getClientInformations{
     name
+    idClient
     list(limit: $limit, offset: $offset){
       idList
       idClient
@@ -171,5 +172,17 @@ export const LIST_TOTAL_TASK_MUTATION = gql`
     $idClient: Float!
   ){
     getListsTotalTasks(idList: $idList, idClient: $idClient)
+  }
+`
+
+export const ALL_CLIENT_TASKS_MUTATION = gql`
+  mutation ($limit: Float!, $offset: Float!){
+    getAllTasks(limit: $limit, offset: $offset){
+      idTask
+      idList
+      title
+      complete
+      description
+    }
   }
 `

@@ -11,15 +11,17 @@ import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types'
 import { useMutation, useQuery } from '@apollo/client'
 import { DELETE_LIST_MUTATION, NEW_TASK_MUTATION, RENAME_LIST_MUTATION, 
-    UPDATE_TASK_DESCRIPTION_MUTATION, DELETE_TASK_MUTATION, LIST_TOTAL_TASK_MUTATION, LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION } from '../../graphQL/Mutations'
+    UPDATE_TASK_DESCRIPTION_MUTATION, DELETE_TASK_MUTATION, LIST_TOTAL_TASK_MUTATION, 
+    LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION, ALL_CLIENT_TASKS_MUTATION } from '../../graphQL/Mutations'
 import Tasks from './Tasks'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup';
 import Pagination from '../Pagination'
+import { GET_CLIENT_TOTAL_TASKS } from '../../graphQL/Queries'
 
 const CenterColumn = ({ 
-    lists, activeList, setChangeLayout, changeLayout, refetch, setActiveList,
-    rename, setRename, showOptions, setShowOptions, setPaginatedLists
+    lists, activeList, setChangeLayout, changeLayout, refetch, setActiveList, rename, setRename, 
+    showOptions, setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient
 }) => {
 
     const [listIsActive, setListIsActive] = useState(false);
@@ -59,12 +61,35 @@ const CenterColumn = ({
     }); */
 
     //Pagination States
+    const { data: totalClientAllTasks} = useQuery(GET_CLIENT_TOTAL_TASKS);
+    const [getClientAllTasks] = useMutation(ALL_CLIENT_TASKS_MUTATION);
     const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
     const [getListTasks] = useMutation(LIST_INFO_MUTATION);
     const [currentTaskPage, setTaskCurrentPage] = useState(1);
+    const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
     const [tasksPerPage] = useState(11);
     const [totalTasks, setTotalTasks] = useState(1);
     const [listsPerPage] = useState(5);
+    const [allTasksList, setAllTasksList] = useState();
+
+    function changeClientAllTasks() {
+        const offset = tasksPerPage * (currentTotalTaskPage - 1);
+            getClientAllTasks({variables: {limit: tasksPerPage, offset: offset}})
+            .then(data => {
+                if(data.data.getAllTasks){
+                    //console.log(data.data.getAllTasks)
+                    setAllTasksList(data.data.getAllTasks)
+                    //setActiveList(data.data)
+                }
+            })
+    }
+
+    useEffect(() => {
+        if(showAllTasks){
+            changeClientAllTasks();
+        }
+        
+    }, [showAllTasks, currentTotalTaskPage])
 
     function paginatedTasks() {
         const {idList, idClient} = activeList;
@@ -72,7 +97,7 @@ const CenterColumn = ({
         getListTasks({variables: { idList: idList, idClient: idClient, limit: tasksPerPage, offset: offset }})
           .then( data => {
               if(data.data){
-                  //leak
+                  //memory leak
                   //setActiveList(data.data.getList);
                   //console.log(data.data.getList);
               }
@@ -238,8 +263,10 @@ const CenterColumn = ({
                 <TasksToolbar>
 
                     <TasksToolbarTitleContainer>
-                        {activeList && !rename && (<TasksToolbarTitleItem><H2>{activeList.listName}</H2></TasksToolbarTitleItem>)}
-                        {activeList && rename && (
+                        {showAllTasks && (<TasksToolbarTitleItem><H2>Tasks</H2></TasksToolbarTitleItem>)}
+                        
+                        {activeList && !rename && !showAllTasks && (<TasksToolbarTitleItem><H2>{activeList.listName}</H2></TasksToolbarTitleItem>)}
+                        {activeList && rename && !showAllTasks && (
                             <Formik
                             initialValues={{ listName: activeList.listName }}
                             validationSchema={validateRename}
@@ -252,17 +279,20 @@ const CenterColumn = ({
                             )}
                         </Formik>
                         )}
-                        <TasksToolbarTitleItem>
-                            <H2><Img src={more} alt="" onClick={() => setShowOptions(!showOptions)} /></H2>
-                            {showOptions && (
-                                <Options>
-                                    <Actions onClick={(doRename)}>Rename List</Actions>
-                                    <Actions onClick={(removeList)}><Warnning>Delete List</Warnning></Actions>
-                                </Options>
-                            )}
-                        </TasksToolbarTitleItem>
+                        {!showAllTasks && (
+                            <TasksToolbarTitleItem>
+                                <H2><Img src={more} alt="" onClick={() => setShowOptions(!showOptions)} /></H2>
+                                {showOptions && (
+                                    <Options>
+                                        <Actions onClick={(doRename)}>Rename List</Actions>
+                                        <Actions onClick={(removeList)}><Warnning>Delete List</Warnning></Actions>
+                                    </Options>
+                                )}
+                            </TasksToolbarTitleItem>
+                        )}
                         
-                        {activeList && (<Pagination listsPerPage={tasksPerPage} totalLists={totalTasks.getListsTotalTasks} setCurrentPage={setTaskCurrentPage} />)}
+                        {activeList && !showAllTasks && (<Pagination listsPerPage={tasksPerPage} totalLists={totalTasks.getListsTotalTasks} setCurrentPage={setTaskCurrentPage} />)}
+                        {activeList && showAllTasks && (<Pagination listsPerPage={tasksPerPage} totalLists={totalClientAllTasks.getTotalAllTasks} setCurrentPage={setCurrentTotalTaskPage} />)}
                     
                     </TasksToolbarTitleContainer>
                     
@@ -282,6 +312,7 @@ const CenterColumn = ({
                     
                 </TasksToolbar>
 
+                {!showAllTasks && (
                 <BaseAdd>
                     <Add>+</Add>
                     <Formik
@@ -296,13 +327,23 @@ const CenterColumn = ({
                         )}
                     </Formik>
                 </BaseAdd>
+                )}
                 
                 {/* console.log(activeList) */}
-                {listIsActive && (
+                {listIsActive && !showAllTasks && (
                     <Tasks 
-                        list={activeList}
+                        list={activeList.taskss}
                         setChangeLayout={setChangeLayout}
                         setActiveTask={setActiveTask}
+                        loggedIdClient={loggedIdClient}
+                    />
+                )}
+                {listIsActive && showAllTasks && (
+                    <Tasks 
+                        list={allTasksList}
+                        setChangeLayout={setChangeLayout}
+                        setActiveTask={setActiveTask}
+                        loggedIdClient={loggedIdClient}
                     />
                 )}
 
@@ -341,7 +382,9 @@ const CenterColumn = ({
         rename: PropTypes.bool,
         showOptions: PropTypes.bool,
         setShowOptions: PropTypes.func,
-        setPaginatedLists: PropTypes.func
+        setPaginatedLists: PropTypes.func,
+        showAllTasks: PropTypes.bool,
+        loggedIdClient: PropTypes.number
     }
     
     export default CenterColumn;
