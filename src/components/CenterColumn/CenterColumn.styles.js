@@ -25,7 +25,7 @@ const DescriptionContainer = styled.div`
     right: 0%;
     padding: 10px;
 `
-const Description = styled.input`
+const Description = styled.textarea`
     margin: 10px;
     padding: 16px;
     border: 1px solid #eaeaea;

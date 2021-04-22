@@ -30,6 +30,7 @@ const CenterColumn = ({
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
     const [newTask] = useMutation(NEW_TASK_MUTATION);
+    // eslint-disable-next-line no-unused-vars
     const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION);
     const [newName] = useMutation(RENAME_LIST_MUTATION);
     /** failed atempt at using cache */
@@ -213,10 +214,11 @@ const CenterColumn = ({
 
     const handleNewDescription = (values) => {
         const {idTask} = activeTask 
-        const {idClient} = activeList
-        const task = { idTask: idTask, description: values.description, idClient: idClient }
+        //const {idClient} = activeList
+        const task = { idTask: idTask, description: values.description, idClient: loggedIdClient }
+        //console.log(task)
         updateDescription({variables: task})
-        paginatedTasks();
+        //paginatedTasks();
     }
 
     const handleDeleteTask = () => {
@@ -355,13 +357,19 @@ const CenterColumn = ({
                     <Formik
                         initialValues={{ description: activeTask.description }}
                         validationSchema={validateNewDescription}
-                        onSubmit={(handleNewDescription)}
+                        //onSubmit={(handleNewDescription)}
+                        //onChange={(handleNewDescription)}
                         >
 
-                        
-                        {() => (
+                        {({values}) => (
                             <Form>
-                                <Field placeholder="Add a Description" autoComplete="off" name="description" as={Description} /><br/>
+                                <Field 
+                                    placeholder="Add a Description" 
+                                    autoComplete="off" 
+                                    name="description" 
+                                    onBlur={(handleNewDescription(values))}
+                                    as={Description} 
+                                    >{ activeTask.description }</Field><br/>
                             </Form>
                         )}
                     </Formik>

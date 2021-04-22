@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {Wrapper, Aside, Flexbox, FormPadding, Button, Label, Input, Warnning } from '../Login/LoginForm.style'
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useHistory } from "react-router-dom";
 import { LOGIN_USER_MUTATION, REGISTER_USER_MUTATION } from '../../graphQL/Mutations';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { DECODED_TOKEN } from '../../graphQL/Queries';
+import { useMutation } from '@apollo/client';
 //import Login from '../imgs/Login.png'
 
 //TODO: Try to put an imagem on the background
@@ -14,8 +13,8 @@ const LoginForm = () => {
   const [logIn, setLogIn] = useState(true);
   const [wrongCredentials, setWrongCredentials] = useState(false);
   const [mailInUse, setMailInUse] = useState(false);
-  const [login, { errorLogin }] = useMutation(LOGIN_USER_MUTATION);
-  const [register, { errorResgister }] = useMutation(REGISTER_USER_MUTATION);
+  const [login] = useMutation(LOGIN_USER_MUTATION);
+  const [register] = useMutation(REGISTER_USER_MUTATION);
   const history = useHistory();
   /* const [decoded, {loading}] = useLazyQuery(DECODED_TOKEN); */
 
@@ -94,7 +93,7 @@ const LoginForm = () => {
               validationSchema={validateLogin}
               onSubmit={(handleLogIn)}
             >
-              {({values, errors}) => (
+              {() => (
                 <Form>
                   <Label>Log In</Label><br/>
                   <Field placeholder="Email" autoComplete="off" name="email" as={Input} /><br/>
@@ -120,7 +119,7 @@ const LoginForm = () => {
             validationSchema={validateRegister}
             onSubmit={(handleRegister)}
           >
-            {({values, errors}) => (
+            {() => (
               <Form>
                 <Label>Register</Label><br/>
                 <Field placeholder="Email" autoComplete="off" name="email" as={Input} /><br/>

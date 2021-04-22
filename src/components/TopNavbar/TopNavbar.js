@@ -13,8 +13,9 @@ import {Options, Actions} from '../CenterColumn/CenterColumn.styles' */
 
 const TopNavbar = ({name}) => {
 
-  const [logOut, {loading}] = useLazyQuery(LOG_OUT);
+  const [logOut] = useLazyQuery(LOG_OUT);
   //const [showOptions, setShowOptions] = useState(false);
+  /* <Li onClick={() => setShowOptions(!showOptions)}> <p>{name}</p> </Li> */
 
   return (
     <Container>
@@ -27,7 +28,7 @@ const TopNavbar = ({name}) => {
                     <Li><Img src={settings} alt="" /></Li>
                     <Li><Img src={help} alt="" /></Li>
                     <Li><Img src={whatsNew} alt="" /></Li>
-                    <Li onClick={() => setShowOptions(!showOptions)}> <p>{name}</p> </Li>
+                    <Li> <p>{name}</p> </Li>
                     <Li><p>| <A onClick={logOut} href="/">Log Out</A></p></Li>
                     {/* showOptions && (
                       <Options>
