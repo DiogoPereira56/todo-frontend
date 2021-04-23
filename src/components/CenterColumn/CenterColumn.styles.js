@@ -49,6 +49,7 @@ const TasksToolbarTitleItem = styled.div`
 `
 const H2 = styled.h2`
     color: #3e69e4;
+    cursor: pointer;
 `
 const Img = styled.img`
     width: 20px;

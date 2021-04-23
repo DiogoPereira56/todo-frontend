@@ -12,7 +12,7 @@ import { PropTypes } from 'prop-types'
 import { useMutation, useQuery } from '@apollo/client'
 import { DELETE_LIST_MUTATION, NEW_TASK_MUTATION, RENAME_LIST_MUTATION, 
     UPDATE_TASK_DESCRIPTION_MUTATION, DELETE_TASK_MUTATION, LIST_TOTAL_TASK_MUTATION, 
-    LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION, ALL_CLIENT_TASKS_MUTATION } from '../../graphQL/Mutations'
+    LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION, ALL_CLIENT_TASKS_MUTATION, UPDATE_TASK_TITLE_MUTATION } from '../../graphQL/Mutations'
 import Tasks from './Tasks'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup';
@@ -26,12 +26,14 @@ const CenterColumn = ({
 
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
+    const [renameTask, setRenameTask] = useState(false);
     const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
     const [newTask] = useMutation(NEW_TASK_MUTATION);
     // eslint-disable-next-line no-unused-vars
     const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION);
+    const [updateTaskTitle] = useMutation(UPDATE_TASK_TITLE_MUTATION);
     const [newName] = useMutation(RENAME_LIST_MUTATION);
     /** failed atempt at using cache */
     /* const [newName2] = useMutation(RENAME_LIST_MUTATION, {
@@ -75,14 +77,14 @@ const CenterColumn = ({
 
     function changeClientAllTasks() {
         const offset = tasksPerPage * (currentTotalTaskPage - 1);
-            getClientAllTasks({variables: {limit: tasksPerPage, offset: offset}})
-            .then(data => {
-                if(data.data.getAllTasks){
-                    //console.log(data.data.getAllTasks)
-                    setAllTasksList(data.data.getAllTasks)
-                    //setActiveList(data.data)
-                }
-            })
+        getClientAllTasks({variables: {limit: tasksPerPage, offset: offset}})
+        .then(data => {
+            if(data.data.getAllTasks){
+                //console.log(data.data.getAllTasks)
+                setAllTasksList(data.data.getAllTasks)
+                //setActiveList(data.data)
+            }
+        })
     }
 
     useEffect(() => {
@@ -218,8 +220,56 @@ const CenterColumn = ({
         const task = { idTask: idTask, description: values.description, idClient: loggedIdClient }
         //console.log(task)
         updateDescription({variables: task})
-        //paginatedTasks();
+        .then(data => {
+            if(data.data.updateTaskDescription){
+                setActiveTask(data.data.updateTaskDescription);
+                //console.log(data.data.updateTaskDescription);
+                //console.log(activeTask);
+            }
+        })
     }
+    
+    const handleUpdateTaskTitle = (values) => {
+        const newTask = { idTask: activeTask.idTask, title: values.title, idClient: loggedIdClient }
+        updateTaskTitle({variables: newTask})
+        .then(data => {
+            if(data.data){
+                //console.log(data.data.updateTaskTitle);
+                setActiveTask(data.data.updateTaskTitle);
+                if(!showAllTasks){
+                    const offset = tasksPerPage * (currentTaskPage - 1);
+                    getListTasks({variables: {
+                        idList: activeList.idList,
+                        idClient: loggedIdClient,
+                        limit: tasksPerPage,
+                        offset: offset
+                        }})
+                        .then( data => {
+                            if(data.data){
+                                setActiveList(data.data.getList);
+                                //console.log(data.data.getList);
+                            }
+                        })
+                }else{
+                    const offset = tasksPerPage * (currentTotalTaskPage - 1);
+                    getClientAllTasks({variables: {limit: tasksPerPage, offset: offset}})
+                    .then(data => {
+                        if(data.data.getAllTasks){
+                            //console.log(data.data.getAllTasks)
+                            setAllTasksList(data.data.getAllTasks)
+                            //setActiveList(data.data)
+                        }
+                    })
+
+                }
+            }
+        })
+        setRenameTask(false);
+    }
+
+    useEffect(() => {
+        setRenameTask(false);
+    }, [changeLayout])
 
     const handleDeleteTask = () => {
         const {idTask} = activeTask;
@@ -254,6 +304,11 @@ const CenterColumn = ({
           .required('A Name is Required'),
     })
 
+    const validateNewTitle = Yup.object({
+        title: Yup.string()
+          .required('A Name is Required'),
+    })
+
     const validateNewDescription = Yup.object({
         description: Yup.string()
           .required('A Name is Required'),
@@ -267,7 +322,11 @@ const CenterColumn = ({
                     <TasksToolbarTitleContainer>
                         {showAllTasks && (<TasksToolbarTitleItem><H2>Tasks</H2></TasksToolbarTitleItem>)}
                         
-                        {activeList && !rename && !showAllTasks && (<TasksToolbarTitleItem><H2>{activeList.listName}</H2></TasksToolbarTitleItem>)}
+                        {activeList && !rename && !showAllTasks && (
+                            <TasksToolbarTitleItem><H2 onClick={() => setShowOptions(!showOptions)}>
+                                {activeList.listName}
+                            </H2></TasksToolbarTitleItem>
+                        )}
                         {activeList && rename && !showAllTasks && (
                             <Formik
                             initialValues={{ listName: activeList.listName }}
@@ -336,6 +395,7 @@ const CenterColumn = ({
                     <Tasks 
                         list={activeList.taskss}
                         setChangeLayout={setChangeLayout}
+                        changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
                     />
@@ -344,6 +404,7 @@ const CenterColumn = ({
                     <Tasks 
                         list={allTasksList}
                         setChangeLayout={setChangeLayout}
+                        changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
                     />
@@ -353,21 +414,31 @@ const CenterColumn = ({
 
             {changeLayout && (
                 <DescriptionContainer>
-                    <H2>{activeTask.title}</H2>
+                    {!renameTask && (<H2 onClick={() => setRenameTask(true)}>{activeTask.title}</H2>)}
+                    {renameTask && (
+                        <Formik
+                            initialValues={{ title: activeTask.title }}
+                            validationSchema={validateNewTitle}
+                            onSubmit={(handleUpdateTaskTitle)}
+                            >
+                            {() => (
+                                <Form>
+                                    <Field placeholder="" autoComplete="off" name="title" as={ListInput} /><br/>
+                                </Form>
+                            )}
+                        </Formik>
+                    )}
                     <Formik
                         initialValues={{ description: activeTask.description }}
                         validationSchema={validateNewDescription}
-                        //onSubmit={(handleNewDescription)}
-                        //onChange={(handleNewDescription)}
-                        >
-
+                    >
                         {({values}) => (
                             <Form>
                                 <Field 
                                     placeholder="Add a Description" 
                                     autoComplete="off" 
                                     name="description" 
-                                    onBlur={(handleNewDescription(values))}
+                                    onBlur={ () => handleNewDescription(values)}
                                     as={Description} 
                                     >{ activeTask.description }</Field><br/>
                             </Form>

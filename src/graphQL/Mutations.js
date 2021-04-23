@@ -138,7 +138,25 @@ export const UPDATE_TASK_DESCRIPTION_MUTATION = gql`
     	idClient: $idClient
     ){
       idTask
-      idList
+      title
+      complete
+      description
+    }
+  }
+`
+
+export const UPDATE_TASK_TITLE_MUTATION = gql`
+  mutation (
+    $idTask: Float!, 
+    $title: String!, 
+    $idClient: Float!
+  ){
+    updateTaskTitle(
+      idTask: $idTask, 
+      title: $title,
+    	idClient: $idClient
+    ){
+      idTask
       title
       complete
       description

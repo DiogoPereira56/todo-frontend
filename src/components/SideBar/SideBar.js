@@ -48,6 +48,11 @@ const SideBar = ({ lists, setActiveList, setChangeLayout, setRename,
     
     }
 
+    function doShowAllTasks() {
+        setShowAllTasks(true);
+        setChangeLayout(false);
+    }
+
     if(errorNewList){
         return <div>error...</div>
     }
@@ -67,7 +72,7 @@ const SideBar = ({ lists, setActiveList, setChangeLayout, setRename,
                     <Li><P>Planned</P></Li>
                     <Li><P>Assigned to you</P></Li>
                     <Li><P>Flagged email</P></Li>
-                    <Li onClick={() => setShowAllTasks(true)}><P>All Tasks</P></Li>
+                    <Li onClick={() => doShowAllTasks()}><P>All Tasks</P></Li>
                 </Ul>
 
                     {lists && (

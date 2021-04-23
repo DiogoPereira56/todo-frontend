@@ -3,13 +3,13 @@ import { PropTypes } from 'prop-types'
 import { UPDATE_TASK_COMPLETION_MUTATION } from '../../graphQL/Mutations';
 import { Task, CheckBox } from './CenterColumn.styles'
 
-const Tasks = ( { list, setChangeLayout, setActiveTask, loggedIdClient } ) => {
+const Tasks = ( { list, setChangeLayout, changeLayout, setActiveTask, loggedIdClient } ) => {
 
   const [updateCompletion] = useMutation(UPDATE_TASK_COMPLETION_MUTATION);
 
   const show = (task) => {
     setActiveTask(task)
-    setChangeLayout(true)
+    setChangeLayout(!changeLayout)
   }
 
   const handleCompletedTask = (task) => {
@@ -35,6 +35,7 @@ const Tasks = ( { list, setChangeLayout, setActiveTask, loggedIdClient } ) => {
 Tasks.propTypes = {
     list: PropTypes.array,
     setChangeLayout: PropTypes.func,
+    changeLayout: PropTypes.bool,
     setActiveTask: PropTypes.func,
     loggedIdClient: PropTypes.number
 };
