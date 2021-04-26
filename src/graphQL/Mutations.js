@@ -83,20 +83,25 @@ export const LIST_INFO_MUTATION = gql`
     $idList: Float!,
     $idClient: Float!,
     $limit: Float!, 
-    $offset: Float!
+    $offset: Float!,
+    $orderByTitle: Boolean!
+  ){
+  getList(idList: $idList, idClient: $idClient){
+    idList
+    idClient
+    listName
+    taskss(
+      limit: $limit, 
+      offset: $offset, 
+      orderByTitle:$orderByTitle
     ){
-    getList(idList: $idList, idClient: $idClient){
-      idList
-      idClient
-      listName
-      taskss(limit: $limit, offset: $offset){
-        idTask
-        title
-        complete
-        description
-      }
+      idTask
+      title
+      complete
+      description
     }
   }
+}
 `
 
 //Task Actions
@@ -194,8 +199,18 @@ export const LIST_TOTAL_TASK_MUTATION = gql`
 `
 
 export const ALL_CLIENT_TASKS_MUTATION = gql`
-  mutation ($limit: Float!, $offset: Float!){
-    getAllTasks(limit: $limit, offset: $offset){
+  mutation (
+    $limit: Float!, 
+    $offset: Float!, 
+    $idClient: Float!,
+    $orderByTitle: Boolean!
+){
+    getAllTasks(
+      limit: $limit, 
+      offset: $offset, 
+      idClient: $idClient,
+      orderByTitle: $orderByTitle
+    ){
       idTask
       idList
       title

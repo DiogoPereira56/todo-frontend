@@ -79,7 +79,6 @@ const ChangeTask = styled(TaskToolbarRight)`
 `
 const Button = styled.button`
     cursor: pointer;
-    color: #34373d;
     font-size: 1.4rem;
     border: none;
     background: none;

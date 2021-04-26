@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types'
 import { LIST_INFO_MUTATION } from '../../graphQL/Mutations';
 import { Li, P } from './SideBar.styles'
 
-const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename, setShowOptions, setShowAllTasks }) => {
+const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename, setShowOptions, setShowAllTasks, orderByTitle }) => {
 
   const [getListTasks] = useMutation(LIST_INFO_MUTATION);
 
@@ -13,7 +13,8 @@ const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename, setShow
       idList: list.idList,
       idClient: list.idClient,
       limit: 11,
-      offset: 0
+      offset: 0,
+      orderByTitle: orderByTitle
       }})
       .then( data => {
           if(data.data){
@@ -48,7 +49,8 @@ ListOfTasks.propTypes = {
   setChangeLayout: PropTypes.func,
   setRename: PropTypes.func,
   setShowOptions: PropTypes.func,
-  setShowAllTasks: PropTypes.func
+  setShowAllTasks: PropTypes.func,
+  orderByTitle: PropTypes.bool
 };
 
 export default ListOfTasks;

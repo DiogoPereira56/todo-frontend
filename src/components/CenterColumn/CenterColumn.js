@@ -20,8 +20,8 @@ import Pagination from '../Pagination'
 import { GET_CLIENT_TOTAL_TASKS } from '../../graphQL/Queries'
 
 const CenterColumn = ({ 
-    lists, activeList, setChangeLayout, changeLayout, setActiveList, rename, setRename, 
-    showOptions, setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient
+    lists, activeList, setChangeLayout, changeLayout, setActiveList, rename, setRename, showOptions,
+    setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient, setOrderByTitle, orderByTitle
 }) => {
 
     const [listIsActive, setListIsActive] = useState(false);
@@ -77,7 +77,7 @@ const CenterColumn = ({
 
     function changeClientAllTasks() {
         const offset = tasksPerPage * (currentTotalTaskPage - 1);
-        getClientAllTasks({variables: {limit: tasksPerPage, offset: offset}})
+        getClientAllTasks({variables: {limit: tasksPerPage, offset: offset, idClient: loggedIdClient, orderByTitle: orderByTitle}})
         .then(data => {
             if(data.data.getAllTasks){
                 //console.log(data.data.getAllTasks)
@@ -97,8 +97,13 @@ const CenterColumn = ({
     function paginatedTasks() {
         const {idList, idClient} = activeList;
         const offset = tasksPerPage * (currentTaskPage - 1);
-        getListTasks({variables: { idList: idList, idClient: idClient, limit: tasksPerPage, offset: offset }})
-          .then( data => {
+        getListTasks({variables: { 
+            idList: idList, 
+            idClient: idClient, 
+            limit: tasksPerPage, 
+            offset: offset, 
+            orderByTitle: orderByTitle }})
+        .then( data => {
               if(data.data){
                   //memory leak
                   //setActiveList(data.data.getList);
@@ -119,7 +124,8 @@ const CenterColumn = ({
                     idList: data.data.getClientInformations.list[0].idList,
                     idClient: data.data.getClientInformations.list[0].idClient,
                     limit: tasksPerPage,
-                    offset: 0
+                    offset: 0,
+                    orderByTitle: orderByTitle
                     }})
                     .then( data => {
                         if(data.data){
@@ -228,6 +234,27 @@ const CenterColumn = ({
             }
         })
     }
+
+    function getTasks() {
+        if(!showAllTasks){
+            const offset = tasksPerPage * (currentTaskPage - 1);
+            getListTasks({variables: {
+                idList: activeList.idList,
+                idClient: loggedIdClient,
+                limit: tasksPerPage,
+                offset: offset,
+                orderByTitle: orderByTitle
+                }})
+                .then( data => {
+                    if(data.data){
+                        setActiveList(data.data.getList);
+                        //console.log(data.data.getList);
+                    }
+                })
+        }else{
+            changeClientAllTasks();
+        }
+    }
     
     const handleUpdateTaskTitle = (values) => {
         const newTask = { idTask: activeTask.idTask, title: values.title, idClient: loggedIdClient }
@@ -236,32 +263,7 @@ const CenterColumn = ({
             if(data.data){
                 //console.log(data.data.updateTaskTitle);
                 setActiveTask(data.data.updateTaskTitle);
-                if(!showAllTasks){
-                    const offset = tasksPerPage * (currentTaskPage - 1);
-                    getListTasks({variables: {
-                        idList: activeList.idList,
-                        idClient: loggedIdClient,
-                        limit: tasksPerPage,
-                        offset: offset
-                        }})
-                        .then( data => {
-                            if(data.data){
-                                setActiveList(data.data.getList);
-                                //console.log(data.data.getList);
-                            }
-                        })
-                }else{
-                    const offset = tasksPerPage * (currentTotalTaskPage - 1);
-                    getClientAllTasks({variables: {limit: tasksPerPage, offset: offset}})
-                    .then(data => {
-                        if(data.data.getAllTasks){
-                            //console.log(data.data.getAllTasks)
-                            setAllTasksList(data.data.getAllTasks)
-                            //setActiveList(data.data)
-                        }
-                    })
-
-                }
+                getTasks();
             }
         })
         setRenameTask(false);
@@ -292,6 +294,12 @@ const CenterColumn = ({
     const doRename = () => {
         setShowOptions(false)
         setRename(!rename)
+    }
+
+    const doSort = () => {
+        setOrderByTitle(!orderByTitle);
+        //console.log(orderByTitle)
+        getTasks();
     }
     
     const validateNewTask = Yup.object({
@@ -358,14 +366,14 @@ const CenterColumn = ({
                     </TasksToolbarTitleContainer>
                     
                     {changeLayout &&(
-                        <TaskToolbarRight changeLayout>
+                        <TaskToolbarRight changeLayout onClick={(doSort)}>
                             <Img src={sort} alt="" />
                             <Button>Sort</Button>
                         </TaskToolbarRight>
                     )}
 
                     {!changeLayout &&(
-                        <TaskToolbarRight>
+                        <TaskToolbarRight onClick={(doSort)} >
                             <Img src={sort} alt="" />
                             <Button>Sort</Button>
                         </TaskToolbarRight>
@@ -464,7 +472,9 @@ const CenterColumn = ({
         setShowOptions: PropTypes.func,
         setPaginatedLists: PropTypes.func,
         showAllTasks: PropTypes.bool,
-        loggedIdClient: PropTypes.number
+        loggedIdClient: PropTypes.number,
+        setOrderByTitle: PropTypes.func,
+        orderByTitle: PropTypes.bool
     }
     
     export default CenterColumn;

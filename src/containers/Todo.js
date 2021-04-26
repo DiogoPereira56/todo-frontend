@@ -30,6 +30,7 @@ const Todo = () => {
   const [changeLayout, setChangeLayout] = useState(false);
   const [activeList, setActiveList] = useState();
   const [showAllTasks, setShowAllTasks] = useState(false);
+  const [orderByTitle, setOrderByTitle] = useState(false);
   //Paginated states
   const [currentPage, setCurrentPage] = useState(1);
   const [listsPerPage] = useState(5);
@@ -50,7 +51,8 @@ const Todo = () => {
                 idList: data.data.getClientInformations.list[0].idList,
                 idClient: data.data.getClientInformations.list[0].idClient,
                 limit: 11,
-                offset: 0
+                offset: 0,
+                orderByTitle: orderByTitle
                 }})
                 .then( data => {
                     if(data.data){
@@ -85,6 +87,7 @@ const Todo = () => {
           listsPerPage={listsPerPage}
           setPaginatedLists={setPaginatedLists}
           setShowAllTasks={setShowAllTasks}
+          orderByTitle={orderByTitle}
         />
         
         <CenterColumn 
@@ -100,6 +103,9 @@ const Todo = () => {
           setPaginatedLists={setPaginatedLists}
           showAllTasks={showAllTasks}
           loggedIdClient={loggedIdClient}
+          setOrderByTitle={setOrderByTitle}
+          orderByTitle={orderByTitle}
+
         />
       </Wrapper>
       )}

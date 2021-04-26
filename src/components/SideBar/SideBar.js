@@ -10,8 +10,9 @@ import { GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
 import { PropTypes } from 'prop-types'
 import Pagination from '../Pagination';
 
-const SideBar = ({ lists, setActiveList, setChangeLayout, setRename, 
-    setShowOptions, setCurrentPage, currentPage, listsPerPage, setPaginatedLists, setShowAllTasks }) => {
+const SideBar = ({ lists, setActiveList, setChangeLayout, setRename, setShowOptions, setCurrentPage,
+     currentPage, listsPerPage, setPaginatedLists, setShowAllTasks, orderByTitle 
+    }) => {
     
     const { data: totalLists} = useQuery(GET_CLIENT_TOTAL_LISTS);
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
@@ -83,6 +84,7 @@ const SideBar = ({ lists, setActiveList, setChangeLayout, setRename,
                         setRename={setRename}
                         setShowOptions={setShowOptions}
                         setShowAllTasks={setShowAllTasks}
+                        orderByTitle={orderByTitle}
                     />)}
                 
                 <Formik
@@ -121,7 +123,8 @@ const SideBar = ({ lists, setActiveList, setChangeLayout, setRename,
         currentPage: PropTypes.number,
         listsPerPage: PropTypes.number,
         setPaginatedLists: PropTypes.func,
-        setShowAllTasks: PropTypes.func
+        setShowAllTasks: PropTypes.func,
+        orderByTitle: PropTypes.bool
     }
     
     export default SideBar;
