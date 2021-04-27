@@ -11,7 +11,7 @@ import { PropTypes } from 'prop-types'
 import Pagination from '../Pagination';
 
 const SideBar = ({ lists, setActiveList, setChangeLayout, setRename, setShowOptions, setCurrentPage,
-     currentPage, listsPerPage, setPaginatedLists, setShowAllTasks, orderByTitle, setSearchIsActive
+     currentPage, listsPerPage, setPaginatedLists, setShowAllTasks, orderByTitle, setSearchIsActive, order
     }) => {
     
     const { data: totalLists} = useQuery(GET_CLIENT_TOTAL_LISTS);
@@ -87,6 +87,7 @@ const SideBar = ({ lists, setActiveList, setChangeLayout, setRename, setShowOpti
                         setShowAllTasks={setShowAllTasks}
                         orderByTitle={orderByTitle}
                         setSearchIsActive={setSearchIsActive}
+                        order={order}
                     />)}
                 
                 <Formik
@@ -128,6 +129,7 @@ const SideBar = ({ lists, setActiveList, setChangeLayout, setRename, setShowOpti
         setShowAllTasks: PropTypes.func,
         orderByTitle: PropTypes.bool,
         setSearchIsActive: PropTypes.func,
+        order: PropTypes.string
     }
     
     export default SideBar;

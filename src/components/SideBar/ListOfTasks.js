@@ -4,7 +4,7 @@ import { LIST_INFO_MUTATION } from '../../graphQL/Mutations';
 import { Li, P } from './SideBar.styles'
 
 const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename, 
-  setShowOptions, setShowAllTasks, orderByTitle, setSearchIsActive 
+  setShowOptions, setShowAllTasks, orderByTitle, setSearchIsActive, order
 }) => {
 
   const [getListTasks] = useMutation(LIST_INFO_MUTATION);
@@ -16,7 +16,8 @@ const ListOfTasks = ( {lists, setActiveList, setChangeLayout, setRename,
       idClient: list.idClient,
       limit: 11,
       offset: 0,
-      orderByTitle: orderByTitle
+      orderByTitle: orderByTitle,
+      order: order
       }})
       .then( data => {
           if(data.data){
@@ -54,7 +55,8 @@ ListOfTasks.propTypes = {
   setShowOptions: PropTypes.func,
   setShowAllTasks: PropTypes.func,
   orderByTitle: PropTypes.bool,
-  setSearchIsActive: PropTypes.func
+  setSearchIsActive: PropTypes.func,
+  order: PropTypes.string
 };
 
 export default ListOfTasks;

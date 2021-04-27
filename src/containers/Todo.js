@@ -46,6 +46,7 @@ const Todo = () => {
   //Other States 
   const [loggedIdClient, setLoggedIdClient] = useState();
   const [search, setSearch] = useState();
+  const [order, setOrder] = useState('ASC');
 
   function changePaginatedLists() {
     const offset = listsPerPage * (currentPage - 1);
@@ -61,7 +62,8 @@ const Todo = () => {
                 idClient: data.data.getClientInformations.list[0].idClient,
                 limit: tasksPerPage,
                 offset: 0,
-                orderByTitle: orderByTitle
+                orderByTitle: orderByTitle,
+                order: order
                 }})
                 .then( data => {
                     if(data.data){
@@ -105,7 +107,8 @@ const Todo = () => {
         offset: offset, 
         idClient: loggedIdClient, 
         orderByTitle: orderByTitle, 
-        search: values.search
+        search: values.search,
+        order: order
     } })
     .then(data => {
       //console.log(data.data.getSearchedTasks);
@@ -118,7 +121,6 @@ const Todo = () => {
 
   useEffect(() => {
     changePaginatedLists();
-
   }, [currentPage])
 
   return (
@@ -141,6 +143,7 @@ const Todo = () => {
           setShowAllTasks={setShowAllTasks}
           orderByTitle={orderByTitle}
           setSearchIsActive={setSearchIsActive}
+          order={order}
         />
         
         <CenterColumn 
@@ -165,6 +168,8 @@ const Todo = () => {
           setSearchedTasks={setSearchedTasks}
           setCurrentSearchedTasksPage={setCurrentSearchedTasksPage}
           totalSearchedTasks={totalSearchedTasks}
+          order={order}
+          setOrder={setOrder}
         />
       </Wrapper>
       )}

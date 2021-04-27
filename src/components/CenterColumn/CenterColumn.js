@@ -7,6 +7,9 @@ import '../../fonts.css'
 import more from '../../imgs/more.png'
 import sort from '../../imgs/sort.png'
 import hide from '../../imgs/hide.png'
+import asc from '../../imgs/asc.png'
+import desc from '../../imgs/desc.png'
+import remove from '../../imgs/remove.png'
 import deleteTask from '../../imgs/deleteTask.png'
 import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types'
@@ -22,14 +25,15 @@ import Pagination from '../Pagination'
 import { GET_CLIENT_TOTAL_TASKS } from '../../graphQL/Queries'
 
 const CenterColumn = ({ 
-    lists, activeList, setChangeLayout, changeLayout, setActiveList, rename, setRename, showOptions,
-    setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient, setOrderByTitle, orderByTitle, searchedTasks,
-    currentSearchedTasksPage, searchIsActive, search, setSearchedTasks, setCurrentSearchedTasksPage, totalSearchedTasks
+    lists, activeList, setChangeLayout, changeLayout, setActiveList, rename, setRename, showOptions, setShowOptions, setPaginatedLists,
+    showAllTasks, loggedIdClient, setOrderByTitle, orderByTitle, searchedTasks, currentSearchedTasksPage, searchIsActive,
+    search, setSearchedTasks, setCurrentSearchedTasksPage, totalSearchedTasks, order, setOrder
 }) => {
 
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
     const [renameTask, setRenameTask] = useState(false);
+    const [isAsc, setIsAsc] = useState(true);
     const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
@@ -53,7 +57,12 @@ const CenterColumn = ({
 
     function changeClientAllTasks() {
         const offset = tasksPerPage * (currentTotalTaskPage - 1);
-        getClientAllTasks({variables: {limit: tasksPerPage, offset: offset, idClient: loggedIdClient, orderByTitle: orderByTitle}})
+        getClientAllTasks({variables: {
+            limit: tasksPerPage, 
+            offset: offset, idClient: loggedIdClient, 
+            orderByTitle: orderByTitle,
+            order: order
+        } })
         .then(data => {
             if(data.data.getAllTasks){
                 //console.log(data.data.getAllTasks)
@@ -85,7 +94,9 @@ const CenterColumn = ({
             idClient: idClient, 
             limit: tasksPerPage, 
             offset: offset, 
-            orderByTitle: orderByTitle }})
+            orderByTitle: orderByTitle,
+            order: order
+        } })
         .then( data => {
               if(data.data){
                   //memory leak
@@ -108,7 +119,8 @@ const CenterColumn = ({
                     idClient: data.data.getClientInformations.list[0].idClient,
                     limit: tasksPerPage,
                     offset: 0,
-                    orderByTitle: orderByTitle
+                    orderByTitle: orderByTitle,
+                    order: order
                     }})
                     .then( data => {
                         if(data.data){
@@ -225,7 +237,8 @@ const CenterColumn = ({
             idClient: loggedIdClient,
             limit: tasksPerPage,
             offset: offset,
-            orderByTitle: orderByTitle
+            orderByTitle: orderByTitle,
+            order: order
             }})
             .then( data => {
                 if(data.data){
@@ -287,7 +300,8 @@ const CenterColumn = ({
             offset: offset, 
             idClient: loggedIdClient, 
             orderByTitle: orderByTitle, 
-            search: search
+            search: search,
+            order: order
         } })
         .then(data => {
           //console.log(data.data.getSearchedTasks);
@@ -306,10 +320,32 @@ const CenterColumn = ({
         setRename(!rename)
     }
 
+    useEffect(() => {
+        if(activeList){
+            getTasks();
+        }
+    }, [isAsc, orderByTitle])
+
     const doSort = () => {
-        setOrderByTitle(!orderByTitle);
-        //console.log(orderByTitle)
-        getTasks();
+        setOrderByTitle(true);
+        //getTasks();
+    }
+
+    const sortDesc = () => {
+        setIsAsc(false);
+        setOrder('DESC');
+        //getTasks();
+    }
+
+    const sortAsc = () => {
+        setIsAsc(true);
+        setOrder('ASC');
+        //getTasks();
+    }
+
+    const sortRemove = () => {
+        setOrderByTitle(false);
+        //getTasks();
     }
     
     const validateNewTask = Yup.object({
@@ -384,18 +420,44 @@ const CenterColumn = ({
                     </TasksToolbarTitleContainer>
                     
                     {changeLayout &&(
-                        <TaskToolbarRight changeLayout onClick={(doSort)}>
-                            <Img src={sort} alt="" />
-                            <Button>Sort</Button>
+                        <TaskToolbarRight changeLayout>
+                            <Img src={sort} alt="" onClick={(doSort)} />
+                            <Button onClick={(doSort)} >Sort</Button>
+                            <br/><br/>
+                            {orderByTitle && (
+                            <div>
+                                {isAsc && (
+                                    <Img src={asc} alt="" onClick={() => sortDesc()} />
+                                )}
+                                {!isAsc && (
+                                    <Img src={desc} alt="" onClick={() => sortAsc()} />
+                                )}
+                                Sorted
+                                <Img src={remove} alt="" onClick={() => sortRemove()} />
+                            </div>
+                            )}
                         </TaskToolbarRight>
                     )}
 
-                    {!changeLayout &&(
-                        <TaskToolbarRight onClick={(doSort)} >
-                            <Img src={sort} alt="" />
-                            <Button>Sort</Button>
+                    {!changeLayout &&(<>
+                        <TaskToolbarRight>
+                            <Img src={sort} alt="" onClick={(doSort)} />
+                            <Button onClick={(doSort)} >Sort</Button>
+                            <br/><br/>
+                            {orderByTitle && (
+                            <div>
+                                {isAsc && (
+                                    <Img src={asc} alt="" onClick={() => sortDesc()} />
+                                )}
+                                {!isAsc && (
+                                    <Img src={desc} alt="" onClick={() => sortAsc()} />
+                                )}
+                                Sorted
+                                <Img src={remove} alt="" onClick={() => sortRemove()} />
+                            </div>
+                            )}
                         </TaskToolbarRight>
-                    )}
+                    </>)}
                     
                 </TasksToolbar>
 
@@ -510,7 +572,9 @@ const CenterColumn = ({
         search: PropTypes.string,
         setSearchedTasks: PropTypes.func,
         setCurrentSearchedTasksPage: PropTypes.func,
-        totalSearchedTasks: PropTypes.number
+        totalSearchedTasks: PropTypes.number,
+        order: PropTypes.string,
+        setOrder: PropTypes.func
     }
     
     export default CenterColumn;

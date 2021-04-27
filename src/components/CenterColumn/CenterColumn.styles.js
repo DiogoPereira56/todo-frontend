@@ -72,7 +72,7 @@ const ListInput = styled.input`
 //Task Sorter
 const TaskToolbarRight = styled.div`
     //margin-left: 950px;
-    margin-left: ${props => (props.changeLayout) ? '600px' : '950px'};
+    margin-left: ${props => (props.changeLayout) ? '550px' : '900px'};
 `
 const ChangeTask = styled(TaskToolbarRight)`
     margin-left: 600px;

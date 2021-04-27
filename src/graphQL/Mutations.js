@@ -80,11 +80,12 @@ export const RENAME_LIST_MUTATION = gql`
 
 export const LIST_INFO_MUTATION = gql`
   mutation getListInfo(
-    $idList: Float!,
-    $idClient: Float!,
-    $limit: Float!, 
-    $offset: Float!,
-    $orderByTitle: Boolean!
+  $idList: Float!,
+  $idClient: Float!,
+  $limit: Float!, 
+  $offset: Float!,
+  $orderByTitle: Boolean!,
+  $order: String!
   ){
   getList(idList: $idList, idClient: $idClient){
     idList
@@ -93,7 +94,8 @@ export const LIST_INFO_MUTATION = gql`
     taskss(
       limit: $limit, 
       offset: $offset, 
-      orderByTitle:$orderByTitle
+      orderByTitle:$orderByTitle,
+      order: $order
     ){
       idTask
       title
@@ -203,13 +205,15 @@ export const ALL_CLIENT_TASKS_MUTATION = gql`
     $limit: Float!, 
     $offset: Float!, 
     $idClient: Float!,
-    $orderByTitle: Boolean!
-){
+    $orderByTitle: Boolean!,
+  	$order: String!
+  ){
     getAllTasks(
       limit: $limit, 
       offset: $offset, 
       idClient: $idClient,
-      orderByTitle: $orderByTitle
+      orderByTitle: $orderByTitle,
+      order: $order
     ){
       idTask
       idList
@@ -225,14 +229,16 @@ export const SEARCHED_TASKS_MUTATION = gql`
     $offset: Float!, 
     $idClient: Float!,
     $orderByTitle: Boolean!,
-    $search: String!
+    $search: String!,
+  	$order: String!
   ){
       getSearchedTasks(
         limit: $limit, 
         offset: $offset, 
         idClient: $idClient,
         orderByTitle: $orderByTitle,
-        search: $search
+        search: $search,
+        order: $order
       ){
         idTask
         idList
