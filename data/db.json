@@ -1,41 +1,42 @@
-{"client": [
-  {
-    "id" : 1,
-    "name": "Diogo Henrique",
-    "lists": [
-      {
-        "id": 1,
-        "listName": "List1",
-        "tasks": [
-            {
-                "id": 1,
-                "complete": false,
-                "description": "Task1"
-            },
-            {
-                "id": 2,
-                "complete": false,
-                "description": "Task2"
-            }
-        ]
-      },
-      {
-        "id": 2,
-        "listName": "List2",
-        "tasks": [
-            {
-                "id": 1,
-                "complete": false,
-                "description": "Another Task1"
-            },
-            {
-                "id": 2,
-                "complete": false,
-                "description": "Some other Task2"
-            }
-          ]
+{
+    "client": [
+        {
+            "id": 1,
+            "name": "Diogo Henrique",
+            "lists": [
+                {
+                    "id": 1,
+                    "listName": "List1",
+                    "tasks": [
+                        {
+                            "id": 1,
+                            "complete": false,
+                            "description": "Task1"
+                        },
+                        {
+                            "id": 2,
+                            "complete": false,
+                            "description": "Task2"
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "listName": "List2",
+                    "tasks": [
+                        {
+                            "id": 1,
+                            "complete": false,
+                            "description": "Another Task1"
+                        },
+                        {
+                            "id": 2,
+                            "complete": false,
+                            "description": "Some other Task2"
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

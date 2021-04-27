@@ -1,5 +1,5 @@
 import { Container, Navbar, Img } from '../TopNavbar/TopNavbar.styles';
-import iconSquared from '../../imgs/iconSquared.png'
+import iconSquared from '../../imgs/iconSquared.png';
 
 const LoginHeader = () => {
     return (
@@ -10,6 +10,6 @@ const LoginHeader = () => {
             </Navbar>
         </Container>
     );
-}
+};
 
 export default LoginHeader;
