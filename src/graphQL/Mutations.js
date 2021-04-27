@@ -219,3 +219,31 @@ export const ALL_CLIENT_TASKS_MUTATION = gql`
     }
   }
 `
+export const SEARCHED_TASKS_MUTATION = gql`
+  mutation (
+    $limit: Float!, 
+    $offset: Float!, 
+    $idClient: Float!,
+    $orderByTitle: Boolean!,
+    $search: String!
+  ){
+      getSearchedTasks(
+        limit: $limit, 
+        offset: $offset, 
+        idClient: $idClient,
+        orderByTitle: $orderByTitle,
+        search: $search
+      ){
+        idTask
+        idList
+        title
+        complete
+        description
+      }
+    }
+  `
+export const TOTAL_SEARCHED_TASKS_MUTATION = gql`
+  mutation ($idClient: Float!, $search: String!){
+    getTotalSearchedTasks(idClient: $idClient, search: $search)
+  }
+`

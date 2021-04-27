@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {CenterBar, TasksToolbar, TasksToolbarTitleContainer, TasksToolbarTitleItem, H2, 
     Img, TaskToolbarRight, Button, BaseAdd, Add, Input,
     DescriptionContainer, Description, Wrapper, Hide, Options, Actions, ListInput} from './CenterColumn.styles'
@@ -10,9 +11,10 @@ import deleteTask from '../../imgs/deleteTask.png'
 import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types'
 import { useMutation, useQuery } from '@apollo/client'
-import { DELETE_LIST_MUTATION, NEW_TASK_MUTATION, RENAME_LIST_MUTATION, 
+import { DELETE_LIST_MUTATION, NEW_TASK_MUTATION, RENAME_LIST_MUTATION,
     UPDATE_TASK_DESCRIPTION_MUTATION, DELETE_TASK_MUTATION, LIST_TOTAL_TASK_MUTATION, 
-    LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION, ALL_CLIENT_TASKS_MUTATION, UPDATE_TASK_TITLE_MUTATION } from '../../graphQL/Mutations'
+    LIST_INFO_MUTATION, CLIENT_LISTS_MUTATION, ALL_CLIENT_TASKS_MUTATION, 
+    UPDATE_TASK_TITLE_MUTATION, SEARCHED_TASKS_MUTATION } from '../../graphQL/Mutations'
 import Tasks from './Tasks'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup';
@@ -21,7 +23,8 @@ import { GET_CLIENT_TOTAL_TASKS } from '../../graphQL/Queries'
 
 const CenterColumn = ({ 
     lists, activeList, setChangeLayout, changeLayout, setActiveList, rename, setRename, showOptions,
-    setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient, setOrderByTitle, orderByTitle
+    setShowOptions, setPaginatedLists, showAllTasks, loggedIdClient, setOrderByTitle, orderByTitle, searchedTasks,
+    currentSearchedTasksPage, searchIsActive, search, setSearchedTasks, setCurrentSearchedTasksPage, totalSearchedTasks
 }) => {
 
     const [listIsActive, setListIsActive] = useState(false);
@@ -31,37 +34,10 @@ const CenterColumn = ({
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
     const [newTask] = useMutation(NEW_TASK_MUTATION);
-    // eslint-disable-next-line no-unused-vars
     const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION);
     const [updateTaskTitle] = useMutation(UPDATE_TASK_TITLE_MUTATION);
     const [newName] = useMutation(RENAME_LIST_MUTATION);
-    /** failed atempt at using cache */
-    /* const [newName2] = useMutation(RENAME_LIST_MUTATION, {
-        update(cache, { data: { newName } }) {
-          cache.modify({
-            id: cache.identify(activeList),
-            fields: {
-              comments(existingCommentRefs = [], { readField }) {
-                const newCommentRef = cache.writeFragment({
-                  data: newName,
-                  fragment: gql`
-                    fragment NewComment on Comment {
-                        idList
-                        listName
-                        tasks{
-                            idTask
-                            title
-                            complete
-                            description
-                        }
-                  `
-                });
-                return [...existingCommentRefs, newCommentRef];
-              }
-            }
-          });
-        }
-    }); */
+    const [getSearchedTasks] = useMutation(SEARCHED_TASKS_MUTATION);
 
     //Pagination States
     const { data: totalClientAllTasks} = useQuery(GET_CLIENT_TOTAL_TASKS);
@@ -93,6 +69,13 @@ const CenterColumn = ({
         }
         
     }, [showAllTasks, currentTotalTaskPage])
+
+    useEffect(() => {
+        if(showAllTasks){
+            setCurrentTotalTaskPage(1);
+        }
+        
+    }, [showAllTasks])
 
     function paginatedTasks() {
         const {idList, idClient} = activeList;
@@ -235,24 +218,30 @@ const CenterColumn = ({
         })
     }
 
+    const changeListTasks = () =>{
+        const offset = tasksPerPage * (currentTaskPage - 1);
+        getListTasks({variables: {
+            idList: activeList.idList,
+            idClient: loggedIdClient,
+            limit: tasksPerPage,
+            offset: offset,
+            orderByTitle: orderByTitle
+            }})
+            .then( data => {
+                if(data.data){
+                    setActiveList(data.data.getList);
+                    //console.log(data.data.getList);
+                }
+            })
+    }
+
     function getTasks() {
-        if(!showAllTasks){
-            const offset = tasksPerPage * (currentTaskPage - 1);
-            getListTasks({variables: {
-                idList: activeList.idList,
-                idClient: loggedIdClient,
-                limit: tasksPerPage,
-                offset: offset,
-                orderByTitle: orderByTitle
-                }})
-                .then( data => {
-                    if(data.data){
-                        setActiveList(data.data.getList);
-                        //console.log(data.data.getList);
-                    }
-                })
-        }else{
+        if(showAllTasks){
             changeClientAllTasks();
+        }else if(searchIsActive){
+            searchTasks();
+        }else{
+            changeListTasks();
         }
     }
     
@@ -290,6 +279,27 @@ const CenterColumn = ({
         });
         
     }
+
+    const searchTasks = () => {
+        const offset = tasksPerPage * (currentSearchedTasksPage - 1);
+        getSearchedTasks({ variables: {
+            limit: tasksPerPage, 
+            offset: offset, 
+            idClient: loggedIdClient, 
+            orderByTitle: orderByTitle, 
+            search: search
+        } })
+        .then(data => {
+          //console.log(data.data.getSearchedTasks);
+          setSearchedTasks(data.data.getSearchedTasks);
+        })
+    }
+
+    useEffect(() => {
+        if(searchIsActive){
+            searchTasks();
+        }
+    }, [currentSearchedTasksPage])
 
     const doRename = () => {
         setShowOptions(false)
@@ -329,8 +339,9 @@ const CenterColumn = ({
 
                     <TasksToolbarTitleContainer>
                         {showAllTasks && (<TasksToolbarTitleItem><H2>Tasks</H2></TasksToolbarTitleItem>)}
+                        {searchIsActive && (<TasksToolbarTitleItem><H2>Search for: {search}</H2></TasksToolbarTitleItem>)}
                         
-                        {activeList && !rename && !showAllTasks && (
+                        {activeList && !rename && !showAllTasks && !searchIsActive && (
                             <TasksToolbarTitleItem><H2 onClick={() => setShowOptions(!showOptions)}>
                                 {activeList.listName}
                             </H2></TasksToolbarTitleItem>
@@ -348,7 +359,7 @@ const CenterColumn = ({
                             )}
                         </Formik>
                         )}
-                        {!showAllTasks && (
+                        {!showAllTasks && !searchIsActive && (
                             <TasksToolbarTitleItem>
                                 <H2><Img src={more} alt="" onClick={() => setShowOptions(!showOptions)} /></H2>
                                 {showOptions && (
@@ -360,8 +371,15 @@ const CenterColumn = ({
                             </TasksToolbarTitleItem>
                         )}
                         
-                        {activeList && !showAllTasks && (<Pagination listsPerPage={tasksPerPage} totalLists={totalTasks.getListsTotalTasks} setCurrentPage={setTaskCurrentPage} />)}
-                        {activeList && showAllTasks && (<Pagination listsPerPage={tasksPerPage} totalLists={totalClientAllTasks.getTotalAllTasks} setCurrentPage={setCurrentTotalTaskPage} />)}
+                        {activeList && !showAllTasks && !searchIsActive && (
+                            <Pagination listsPerPage={tasksPerPage} totalLists={totalTasks.getListsTotalTasks} setCurrentPage={setTaskCurrentPage} />
+                        )}
+                        {activeList && showAllTasks && !searchIsActive && (
+                            <Pagination listsPerPage={tasksPerPage} totalLists={totalClientAllTasks.getTotalAllTasks} setCurrentPage={setCurrentTotalTaskPage} />
+                        )}
+                        {activeList && !showAllTasks && searchIsActive && (
+                            <Pagination listsPerPage={tasksPerPage} totalLists={totalSearchedTasks} setCurrentPage={setCurrentSearchedTasksPage} />
+                        )}
                     
                     </TasksToolbarTitleContainer>
                     
@@ -381,7 +399,7 @@ const CenterColumn = ({
                     
                 </TasksToolbar>
 
-                {!showAllTasks && (
+                {!showAllTasks && !searchIsActive && (
                 <BaseAdd>
                     <Add>+</Add>
                     <Formik
@@ -399,7 +417,7 @@ const CenterColumn = ({
                 )}
                 
                 {/* console.log(activeList) */}
-                {listIsActive && !showAllTasks && (
+                {listIsActive && !showAllTasks && !searchIsActive && (
                     <Tasks 
                         list={activeList.taskss}
                         setChangeLayout={setChangeLayout}
@@ -408,9 +426,20 @@ const CenterColumn = ({
                         loggedIdClient={loggedIdClient}
                     />
                 )}
-                {listIsActive && showAllTasks && (
+
+                {listIsActive && showAllTasks && !searchIsActive && (
                     <Tasks 
                         list={allTasksList}
+                        setChangeLayout={setChangeLayout}
+                        changeLayout={changeLayout}
+                        setActiveTask={setActiveTask}
+                        loggedIdClient={loggedIdClient}
+                    />
+                )}
+
+                {listIsActive && !showAllTasks && searchIsActive && (
+                    <Tasks 
+                        list={searchedTasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
@@ -474,7 +503,14 @@ const CenterColumn = ({
         showAllTasks: PropTypes.bool,
         loggedIdClient: PropTypes.number,
         setOrderByTitle: PropTypes.func,
-        orderByTitle: PropTypes.bool
+        orderByTitle: PropTypes.bool,
+        searchedTasks: PropTypes.array,
+        currentSearchedTasksPage: PropTypes.number,
+        searchIsActive: PropTypes.bool,
+        search: PropTypes.string,
+        setSearchedTasks: PropTypes.func,
+        setCurrentSearchedTasksPage: PropTypes.func,
+        totalSearchedTasks: PropTypes.number
     }
     
     export default CenterColumn;
