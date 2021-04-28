@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 
 //Wrapper that wrapps the rest of the code
-const CenterBar = styled.div`
-    margin-left: 290px;
-`;
+const CenterBar = styled.div``;
 const TasksToolbar = styled.div`
     padding: 12px 16px 0 16px;
     display: flex;

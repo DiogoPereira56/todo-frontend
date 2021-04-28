@@ -3,6 +3,7 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
     display: flex;
     position: relative;
+    margin-right: 290px;
 `;
 const SideBar2 = styled.div`
     width: 290px;

@@ -1,11 +1,11 @@
 import '../fonts.css';
-import LoginHeader from '../components/Login/LoginHeader.js';
+import SimpleHeader from '../components/SimpleHeader.js';
 import LoginForm from '../components/Login/LoginForm.js';
 
 const Login = () => {
     return (
         <div>
-            <LoginHeader />
+            <SimpleHeader />
             <LoginForm />
         </div>
     );

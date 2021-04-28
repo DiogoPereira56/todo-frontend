@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import styled from 'styled-components';
 import '../fonts.css';
+import { Wrapper, NoList, H2, Unauthorized, A, P } from '../components/Todo.styles';
+import SimpleHeader from '../components/SimpleHeader.js';
 import CenterColumn from '../components/CenterColumn/CenterColumn.js';
 import SideBar from '../components/SideBar/SideBar.js';
 import TopNavbar from '../components/TopNavbar/TopNavbar.js';
@@ -14,20 +15,15 @@ import {
     TOTAL_SEARCHED_TASKS_MUTATION,
 } from '../graphQL/Mutations';
 
-const Wrapper = styled.div`
-    display: flex;
-    flex: 1 1 0px;
-    will-change: width;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-`;
-
 const Todo = () => {
     //Queries
     const { error: errorAuth, loading: loadingAuth, data: dataClient } = useQuery(GET_CLIENT_INFORMATION);
     //Mutations
-    const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
+    const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION, {
+        onError() {
+            console.log('error');
+        },
+    });
     const [getListTasks] = useMutation(LIST_INFO_MUTATION);
     const [getSearchedTasks] = useMutation(SEARCHED_TASKS_MUTATION);
     const [getTotalSearchedTasks] = useMutation(TOTAL_SEARCHED_TASKS_MUTATION);
@@ -55,26 +51,28 @@ const Todo = () => {
     function changePaginatedLists() {
         const offset = listsPerPage * (currentPage - 1);
         getClientLists({ variables: { limit: listsPerPage, offset: offset } }).then((data) => {
-            if (!data.data) {
+            if (!data) {
                 console.log('something went wrong');
             } else {
                 setPaginatedLists(data.data.getClientInformations.list);
-                setLoggedIdClient(data.data.getClientInformations.list[0].idClient);
-                getListTasks({
-                    variables: {
-                        idList: data.data.getClientInformations.list[0].idList,
-                        idClient: data.data.getClientInformations.list[0].idClient,
-                        limit: tasksPerPage,
-                        offset: 0,
-                        orderByTitle: orderByTitle,
-                        order: order,
-                    },
-                }).then((data) => {
-                    if (data.data) {
-                        setActiveList(data.data.getList);
-                        //console.log(data.data.getList);
-                    }
-                });
+                setLoggedIdClient(data.data.getClientInformations.idClient);
+                if (data.data.getClientInformations.list[0]) {
+                    getListTasks({
+                        variables: {
+                            idList: data.data.getClientInformations.list[0].idList,
+                            idClient: data.data.getClientInformations.list[0].idClient,
+                            limit: tasksPerPage,
+                            offset: 0,
+                            orderByTitle: orderByTitle,
+                            order: order,
+                        },
+                    }).then((data) => {
+                        if (data.data) {
+                            setActiveList(data.data.getList);
+                            //console.log(data.data.getList);
+                        }
+                    });
+                }
             }
         });
     }
@@ -134,9 +132,14 @@ const Todo = () => {
             {loadingAuth && <div>Loading...</div>}
             {errorAuth && (
                 <div>
-                    You are Probably not logged in <br />
-                    <br />
-                    Please go ahead and do it <a href="/">here</a>
+                    <SimpleHeader />
+                    <Unauthorized>
+                        <P>You are Probably not logged in</P>
+                        <br />
+                        <P>
+                            Please go ahead and do it <A href="/">here</A>
+                        </P>
+                    </Unauthorized>
                 </div>
             )}
             {dataClient && (
@@ -163,31 +166,38 @@ const Todo = () => {
                         order={order}
                     />
 
-                    <CenterColumn
-                        lists={paginatedLists}
-                        activeList={activeList}
-                        changeLayout={changeLayout}
-                        setChangeLayout={setChangeLayout}
-                        setActiveList={setActiveList}
-                        rename={rename}
-                        setRename={setRename}
-                        showOptions={showOptions}
-                        setShowOptions={setShowOptions}
-                        setPaginatedLists={setPaginatedLists}
-                        showAllTasks={showAllTasks}
-                        loggedIdClient={loggedIdClient}
-                        setOrderByTitle={setOrderByTitle}
-                        orderByTitle={orderByTitle}
-                        searchedTasks={searchedTasks}
-                        currentSearchedTasksPage={currentSearchedTasksPage}
-                        searchIsActive={searchIsActive}
-                        search={search}
-                        setSearchedTasks={setSearchedTasks}
-                        setCurrentSearchedTasksPage={setCurrentSearchedTasksPage}
-                        totalSearchedTasks={totalSearchedTasks}
-                        order={order}
-                        setOrder={setOrder}
-                    />
+                    {!activeList && (
+                        <NoList>
+                            <H2>You Still Haven&apos;t created any List, try doing so in the side bar</H2>
+                        </NoList>
+                    )}
+                    {activeList && (
+                        <CenterColumn
+                            lists={paginatedLists}
+                            activeList={activeList}
+                            changeLayout={changeLayout}
+                            setChangeLayout={setChangeLayout}
+                            setActiveList={setActiveList}
+                            rename={rename}
+                            setRename={setRename}
+                            showOptions={showOptions}
+                            setShowOptions={setShowOptions}
+                            setPaginatedLists={setPaginatedLists}
+                            showAllTasks={showAllTasks}
+                            loggedIdClient={loggedIdClient}
+                            setOrderByTitle={setOrderByTitle}
+                            orderByTitle={orderByTitle}
+                            searchedTasks={searchedTasks}
+                            currentSearchedTasksPage={currentSearchedTasksPage}
+                            searchIsActive={searchIsActive}
+                            search={search}
+                            setSearchedTasks={setSearchedTasks}
+                            setCurrentSearchedTasksPage={setCurrentSearchedTasksPage}
+                            totalSearchedTasks={totalSearchedTasks}
+                            order={order}
+                            setOrder={setOrder}
+                        />
+                    )}
                 </Wrapper>
             )}
         </div>
