@@ -50,7 +50,6 @@ const SideBar = ({
             } else console.log(data.data);
             changePaginatedLists();
         });
-        //refetch();
         values.listName = '';
     };
 
@@ -75,21 +74,6 @@ const SideBar = ({
                     <Img src={menu} alt="" />
                 </H2>
                 <Ul>
-                    <Li>
-                        <P>My day</P>
-                    </Li>
-                    <Li>
-                        <P>Important</P>
-                    </Li>
-                    <Li>
-                        <P>Planned</P>
-                    </Li>
-                    <Li>
-                        <P>Assigned to you</P>
-                    </Li>
-                    <Li>
-                        <P>Flagged email</P>
-                    </Li>
                     <Li onClick={() => doShowAllTasks()}>
                         <P>All Tasks</P>
                     </Li>

@@ -41,7 +41,7 @@ const Todo = () => {
     const [searchIsActive, setSearchIsActive] = useState(false);
     //Paginated states
     const [currentPage, setCurrentPage] = useState(1);
-    const [listsPerPage] = useState(5);
+    const [listsPerPage] = useState(10);
     const [tasksPerPage] = useState(11);
     const [currentSearchedTasksPage, setCurrentSearchedTasksPage] = useState(1);
     const [paginatedLists, setPaginatedLists] = useState();

@@ -11,10 +11,6 @@ const TasksToolbar = styled.div`
 const Wrapper = styled.div`
     display: flex;
     flex: 1 1 0px;
-    will-change: width;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
 `;
 //Description Bar
 const DescriptionContainer = styled.div`
