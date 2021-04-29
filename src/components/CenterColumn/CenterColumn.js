@@ -43,6 +43,7 @@ import {
     ALL_CLIENT_TASKS_MUTATION,
     UPDATE_TASK_TITLE_MUTATION,
     SEARCHED_TASKS_MUTATION,
+    GET_CLIENT_TOTAL_LISTS,
 } from '../../graphQL/Mutations';
 import Tasks from './Tasks';
 import { Field, Form, Formik } from 'formik';
@@ -74,6 +75,7 @@ const CenterColumn = ({
     totalSearchedTasks,
     order,
     setOrder,
+    setTotalLists,
 }) => {
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
@@ -87,6 +89,7 @@ const CenterColumn = ({
     const [updateTaskTitle] = useMutation(UPDATE_TASK_TITLE_MUTATION);
     const [newName] = useMutation(RENAME_LIST_MUTATION);
     const [getSearchedTasks] = useMutation(SEARCHED_TASKS_MUTATION);
+    const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
 
     //Pagination States
     const { data: totalClientAllTasks } = useQuery(GET_CLIENT_TOTAL_TASKS);
@@ -97,7 +100,7 @@ const CenterColumn = ({
     const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
     const [tasksPerPage] = useState(11);
     const [totalTasks, setTotalTasks] = useState(1);
-    const [listsPerPage] = useState(5);
+    const [listsPerPage] = useState(10);
     const [allTasksList, setAllTasksList] = useState();
 
     function changeClientAllTasks() {
@@ -144,20 +147,18 @@ const CenterColumn = ({
                 order: order,
             },
         }).then((data) => {
-            if (data.data) {
-                //memory leak
-                //setActiveList(data.data.getList);
-                //console.log(data.data.getList);
-            }
+            setActiveList(data.data.getList);
+            //console.log(data.data.getList);
         });
     }
 
     function changePaginatedLists() {
         //const offset = listsPerPage * (currentPage - 1);
         getClientLists({ variables: { limit: listsPerPage, offset: 0 } }).then((data) => {
-            if (!data.data) {
+            if (!data) {
                 console.log('something went wrong');
             } else {
+                //console.log(data.data);
                 setPaginatedLists(data.data.getClientInformations.list);
                 getListTasks({
                     variables: {
@@ -181,9 +182,9 @@ const CenterColumn = ({
 
     useEffect(() => {
         //there was a error Leak Here
-        /* if(activeList){
+        if (activeList) {
             paginatedTasks();
-        } */
+        }
     }, [currentTaskPage]);
     //console.log(currentPage);
 
@@ -200,13 +201,20 @@ const CenterColumn = ({
         if (activeList) {
             setListIsActive(true);
             changeTotalTasks();
-            paginatedTasks();
+            //paginatedTasks();
         }
     }, [activeList]);
 
     if (errorDelete) {
         return <div>{errorDelete}</div>;
     }
+
+    const doTotalLists = () => {
+        getTotalLists().then((data) => {
+            //console.log(data.data.getClientTotalLists);
+            setTotalLists(data.data.getClientTotalLists);
+        });
+    };
 
     const removeList = () => {
         const { idList, idClient } = activeList;
@@ -216,6 +224,7 @@ const CenterColumn = ({
             if (!data.data) {
                 console.log('something went wrong');
             } else {
+                doTotalLists();
                 changePaginatedLists();
                 setShowOptions(false);
             }
@@ -230,6 +239,8 @@ const CenterColumn = ({
             idClient: activeList.idClient,
             limit: tasksPerPage,
             offset: 0,
+            orderByTitle: orderByTitle,
+            order: order,
         };
         newName({ variables: newValue })
             .then((data) => {
@@ -251,7 +262,7 @@ const CenterColumn = ({
             if (!data.data) {
                 console.log('something went wrong');
             } else {
-                console.log(data.data);
+                //console.log(data.data);
                 paginatedTasks();
             }
         });
@@ -267,6 +278,7 @@ const CenterColumn = ({
         updateDescription({ variables: task }).then((data) => {
             if (data.data.updateTaskDescription) {
                 setActiveTask(data.data.updateTaskDescription);
+                changeListTasks();
                 //console.log(data.data.updateTaskDescription);
                 //console.log(activeTask);
             }
@@ -326,8 +338,9 @@ const CenterColumn = ({
             if (!data.data) {
                 console.log('something went wrong');
             } else {
-                console.log(data.data);
-                //refetch();
+                //console.log(data.data);
+                //setTaskCurrentPage(1);
+                paginatedTasks();
                 setChangeLayout(false);
             }
         });
@@ -644,6 +657,7 @@ CenterColumn.propTypes = {
     totalSearchedTasks: PropTypes.number,
     order: PropTypes.string,
     setOrder: PropTypes.func,
+    setTotalLists: PropTypes.func,
 };
 
 export default CenterColumn;

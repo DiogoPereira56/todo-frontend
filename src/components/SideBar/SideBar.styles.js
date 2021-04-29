@@ -73,4 +73,10 @@ const Paginnation = styled.div`
     }
 `;
 
-export { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationWrapper, Paginnation };
+const PaginationPosition = styled.div`
+    /* position: absolute;
+    bottom: 18.5%; */
+    //border-bottom: 1px solid #bdb8d7;
+`;
+
+export { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationWrapper, Paginnation, PaginationPosition };

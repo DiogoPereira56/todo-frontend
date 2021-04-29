@@ -41,11 +41,19 @@ export const DELETE_LIST_MUTATION = gql`
 `;
 
 export const RENAME_LIST_MUTATION = gql`
-    mutation newList($idList: Float!, $title: String!, $idClient: Float!, $limit: Float!, $offset: Float!) {
+    mutation newList(
+        $idList: Float!
+        $title: String!
+        $idClient: Float!
+        $limit: Float!
+        $offset: Float!
+        $orderByTitle: Boolean!
+        $order: String!
+    ) {
         updateList(idList: $idList, title: $title, idClient: $idClient) {
             idList
             listName
-            taskss(limit: $limit, offset: $offset) {
+            taskss(limit: $limit, offset: $offset, orderByTitle: $orderByTitle, order: $order) {
                 idTask
                 title
                 complete
@@ -75,6 +83,12 @@ export const LIST_INFO_MUTATION = gql`
                 description
             }
         }
+    }
+`;
+
+export const GET_CLIENT_TOTAL_LISTS = gql`
+    mutation {
+        getClientTotalLists
     }
 `;
 

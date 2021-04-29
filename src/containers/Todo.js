@@ -43,6 +43,7 @@ const Todo = () => {
     const [paginatedLists, setPaginatedLists] = useState();
     const [searchedTasks, setSearchedTasks] = useState();
     const [totalSearchedTasks, setTotalSearchedTasks] = useState(1);
+    const [totalLists, setTotalLists] = useState(1);
     //Other States
     const [loggedIdClient, setLoggedIdClient] = useState();
     const [search, setSearch] = useState();
@@ -51,51 +52,48 @@ const Todo = () => {
     function changePaginatedLists() {
         const offset = listsPerPage * (currentPage - 1);
         getClientLists({ variables: { limit: listsPerPage, offset: offset } }).then((data) => {
-            if (!data) {
-                console.log('something went wrong');
-            } else {
-                setPaginatedLists(data.data.getClientInformations.list);
-                setLoggedIdClient(data.data.getClientInformations.idClient);
-                if (data.data.getClientInformations.list[0]) {
-                    getListTasks({
-                        variables: {
-                            idList: data.data.getClientInformations.list[0].idList,
-                            idClient: data.data.getClientInformations.list[0].idClient,
-                            limit: tasksPerPage,
-                            offset: 0,
-                            orderByTitle: orderByTitle,
-                            order: order,
-                        },
-                    }).then((data) => {
-                        if (data.data) {
-                            setActiveList(data.data.getList);
-                            //console.log(data.data.getList);
-                        }
-                    });
-                }
+            setPaginatedLists(data.data.getClientInformations.list);
+            setLoggedIdClient(data.data.getClientInformations.idClient);
+            if (data.data.getClientInformations.list[0]) {
+                getListTasks({
+                    variables: {
+                        idList: data.data.getClientInformations.list[0].idList,
+                        idClient: data.data.getClientInformations.list[0].idClient,
+                        limit: tasksPerPage,
+                        offset: 0,
+                        orderByTitle: orderByTitle,
+                        order: order,
+                    },
+                }).then((data) => {
+                    if (data.data) {
+                        setActiveList(data.data.getList);
+                        //console.log(data.data.getList);
+                    }
+                });
             }
         });
     }
 
     /* function searchTasks() {
-    const offset = tasksPerPage * (currentSearchedTasksPage - 1);
-    getSearchedTasks({ variables: {
-        limit: tasksPerPage, 
-        offset: offset, 
-        idClient: loggedIdClient, 
-        orderByTitle: orderByTitle, 
-        search: search
-    } })
-    .then(data => {
-      console.log(data.data.getSearchedTasks);
-      setSearchedTasks(data.data.getSearchedTasks);
-    })
-  } */
+        const offset = tasksPerPage * (currentSearchedTasksPage - 1);
+        getSearchedTasks({
+            variables: {
+                limit: tasksPerPage,
+                offset: offset,
+                idClient: loggedIdClient,
+                orderByTitle: orderByTitle,
+                search: search,
+            },
+        }).then((data) => {
+            console.log(data.data.getSearchedTasks);
+            setSearchedTasks(data.data.getSearchedTasks);
+        });
+    } */
 
     const doTotalSearchedTasks = (values) => {
         getTotalSearchedTasks({ variables: { idClient: loggedIdClient, search: values.search } }).then(
             (data) => {
-                console.log(data.data.getTotalSearchedTasks);
+                //console.log(data.data.getTotalSearchedTasks);
                 setTotalSearchedTasks(data.data.getTotalSearchedTasks);
             },
         );
@@ -164,6 +162,8 @@ const Todo = () => {
                         orderByTitle={orderByTitle}
                         setSearchIsActive={setSearchIsActive}
                         order={order}
+                        setTotalLists={setTotalLists}
+                        totalLists={totalLists}
                     />
 
                     {!activeList && (
@@ -196,6 +196,7 @@ const Todo = () => {
                             totalSearchedTasks={totalSearchedTasks}
                             order={order}
                             setOrder={setOrder}
+                            setTotalLists={setTotalLists}
                         />
                     )}
                 </Wrapper>

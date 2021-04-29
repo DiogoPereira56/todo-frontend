@@ -1,14 +1,15 @@
-import { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul } from './SideBar.styles';
+import { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationPosition } from './SideBar.styles';
 import '../../fonts.css';
 import menu from '../../imgs/menu.png';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import ListOfTasks from './ListOfTasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION } from '../../graphQL/Mutations';
-import { GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
+import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION, GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Mutations';
+//import { GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
 import { PropTypes } from 'prop-types';
 import Pagination from '../Pagination';
+import { useEffect } from 'react';
 
 const SideBar = ({
     lists,
@@ -24,8 +25,11 @@ const SideBar = ({
     orderByTitle,
     setSearchIsActive,
     order,
+    setTotalLists,
+    totalLists,
 }) => {
-    const { data: totalLists } = useQuery(GET_CLIENT_TOTAL_LISTS);
+    //const { data: totalLists } = useQuery(GET_CLIENT_TOTAL_LISTS);
+    const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
     const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
     const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
     //todo: try and change 'refetch', to 'cache'
@@ -43,12 +47,26 @@ const SideBar = ({
         });
     }
 
+    const doTotalLists = () => {
+        getTotalLists().then((data) => {
+            console.log(data.data.getClientTotalLists);
+            setTotalLists(data.data.getClientTotalLists);
+        });
+    };
+
+    useEffect(() => {
+        doTotalLists();
+    }, []);
+
     const handleNewList = (values) => {
         makeNewList({ variables: values }).then((data) => {
             if (!data.data) {
                 console.log('something went wrong');
-            } else console.log(data.data);
-            changePaginatedLists();
+            } else {
+                //console.log(data.data);
+                doTotalLists();
+                changePaginatedLists();
+            }
         });
         values.listName = '';
     };
@@ -108,11 +126,14 @@ const SideBar = ({
 
                 {/* console.log(totalLists) */}
                 {totalLists && (
-                    <Pagination
-                        listsPerPage={listsPerPage}
-                        totalLists={totalLists.getClientTotalLists}
-                        setCurrentPage={setCurrentPage}
-                    />
+                    <PaginationPosition>
+                        <Pagination
+                            listsPerPage={listsPerPage}
+                            //totalLists={totalLists.getClientTotalLists}
+                            totalLists={totalLists}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    </PaginationPosition>
                 )}
             </SideBar2>
         </Wrapper>
@@ -134,6 +155,8 @@ SideBar.propTypes = {
     orderByTitle: PropTypes.bool,
     setSearchIsActive: PropTypes.func,
     order: PropTypes.string,
+    setTotalLists: PropTypes.func,
+    totalLists: PropTypes.number,
 };
 
 export default SideBar;

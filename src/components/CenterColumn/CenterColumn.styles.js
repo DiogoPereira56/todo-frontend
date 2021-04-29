@@ -98,6 +98,7 @@ const Input = styled.input`
     border: none;
     font-size: 1rem;
     width: 100%;
+    height: 77px;
 `;
 
 //Tasks

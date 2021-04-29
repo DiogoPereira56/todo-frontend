@@ -44,7 +44,6 @@ const LoginForm = () => {
     const handleRegister = (values) => {
         register({ variables: values }).then((data) => {
             if (!data.data.register) {
-                /* console.log('Something went wrong, ups!'); */
                 setMailInUse(true);
             } else makeLogIn(values);
             /* console.log(data.data); */
