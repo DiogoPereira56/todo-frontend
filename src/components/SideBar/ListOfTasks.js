@@ -13,6 +13,7 @@ const ListOfTasks = ({
     orderByTitle,
     setSearchIsActive,
     order,
+    setCurrentTaskPage,
 }) => {
     const [getListTasks] = useMutation(LIST_INFO_MUTATION);
 
@@ -22,7 +23,7 @@ const ListOfTasks = ({
             variables: {
                 idList: list.idList,
                 idClient: list.idClient,
-                limit: 11,
+                limit: 13,
                 offset: 0,
                 orderByTitle: orderByTitle,
                 order: order,
@@ -42,6 +43,7 @@ const ListOfTasks = ({
         setRename(false);
         setShowOptions(false);
         setSearchIsActive(false);
+        setCurrentTaskPage(1);
     };
 
     return (
@@ -65,6 +67,7 @@ ListOfTasks.propTypes = {
     orderByTitle: PropTypes.bool,
     setSearchIsActive: PropTypes.func,
     order: PropTypes.string,
+    setCurrentTaskPage: PropTypes.func,
 };
 
 export default ListOfTasks;

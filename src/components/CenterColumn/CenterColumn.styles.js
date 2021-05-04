@@ -116,6 +116,12 @@ const CheckBox = styled.input`
     margin-right: 10px;
 `;
 
+const Content = styled.div`
+    display: grid;
+    //grid-template-columns: 1fr 1fr;
+    //overflow-y: scroll;
+`;
+
 //List Options
 const Options = styled.div`
     width: 150px;
@@ -158,4 +164,5 @@ export {
     Options,
     Actions,
     ListInput,
+    Content,
 };

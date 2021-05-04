@@ -37,8 +37,9 @@ const Todo = () => {
     const [searchIsActive, setSearchIsActive] = useState(false);
     //Paginated states
     const [currentPage, setCurrentPage] = useState(1);
+    const [currentTaskPage, setCurrentTaskPage] = useState(1);
     const [listsPerPage] = useState(10);
-    const [tasksPerPage] = useState(11);
+    const [tasksPerPage] = useState(13);
     const [currentSearchedTasksPage, setCurrentSearchedTasksPage] = useState(1);
     const [paginatedLists, setPaginatedLists] = useState();
     const [searchedTasks, setSearchedTasks] = useState();
@@ -52,24 +53,26 @@ const Todo = () => {
     function changePaginatedLists() {
         const offset = listsPerPage * (currentPage - 1);
         getClientLists({ variables: { limit: listsPerPage, offset: offset } }).then((data) => {
-            setPaginatedLists(data.data.getClientInformations.list);
-            setLoggedIdClient(data.data.getClientInformations.idClient);
-            if (data.data.getClientInformations.list[0]) {
-                getListTasks({
-                    variables: {
-                        idList: data.data.getClientInformations.list[0].idList,
-                        idClient: data.data.getClientInformations.list[0].idClient,
-                        limit: tasksPerPage,
-                        offset: 0,
-                        orderByTitle: orderByTitle,
-                        order: order,
-                    },
-                }).then((data) => {
-                    if (data.data) {
-                        setActiveList(data.data.getList);
-                        //console.log(data.data.getList);
-                    }
-                });
+            if (data.data) {
+                setPaginatedLists(data.data.getClientInformations.list);
+                setLoggedIdClient(data.data.getClientInformations.idClient);
+                if (data.data.getClientInformations.list[0]) {
+                    getListTasks({
+                        variables: {
+                            idList: data.data.getClientInformations.list[0].idList,
+                            idClient: data.data.getClientInformations.list[0].idClient,
+                            limit: tasksPerPage,
+                            offset: 0,
+                            orderByTitle: orderByTitle,
+                            order: order,
+                        },
+                    }).then((data) => {
+                        if (data.data) {
+                            setActiveList(data.data.getList);
+                            //console.log(data.data.getList);
+                        }
+                    });
+                }
             }
         });
     }
@@ -164,6 +167,7 @@ const Todo = () => {
                         order={order}
                         setTotalLists={setTotalLists}
                         totalLists={totalLists}
+                        setCurrentTaskPage={setCurrentTaskPage}
                     />
 
                     {!activeList && (
@@ -197,6 +201,8 @@ const Todo = () => {
                             order={order}
                             setOrder={setOrder}
                             setTotalLists={setTotalLists}
+                            currentTaskPage={currentTaskPage}
+                            setCurrentTaskPage={setCurrentTaskPage}
                         />
                     )}
                 </Wrapper>

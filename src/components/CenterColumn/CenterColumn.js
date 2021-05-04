@@ -76,6 +76,8 @@ const CenterColumn = ({
     order,
     setOrder,
     setTotalLists,
+    currentTaskPage,
+    setCurrentTaskPage,
 }) => {
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
@@ -95,10 +97,10 @@ const CenterColumn = ({
     const { data: totalClientAllTasks } = useQuery(GET_CLIENT_TOTAL_TASKS);
     const [getClientAllTasks] = useMutation(ALL_CLIENT_TASKS_MUTATION);
     const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
-    const [getListTasks] = useMutation(LIST_INFO_MUTATION);
-    const [currentTaskPage, setTaskCurrentPage] = useState(1);
+    const [getListTasks, { loading }] = useMutation(LIST_INFO_MUTATION);
+    //const [currentTaskPage, setCurrentTaskPage] = useState(1);
     const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
-    const [tasksPerPage] = useState(11);
+    const [tasksPerPage] = useState(13);
     const [totalTasks, setTotalTasks] = useState(1);
     const [listsPerPage] = useState(10);
     const [allTasksList, setAllTasksList] = useState();
@@ -134,9 +136,12 @@ const CenterColumn = ({
         }
     }, [showAllTasks]);
 
-    function paginatedTasks() {
+    const paginatedTasks = () => {
         const { idList, idClient } = activeList;
+        console.log(currentTaskPage);
         const offset = tasksPerPage * (currentTaskPage - 1);
+        //console.log(idList, idClient, tasksPerPage, offset, orderByTitle, order);
+        //console.log(offset);
         getListTasks({
             variables: {
                 idList: idList,
@@ -147,10 +152,26 @@ const CenterColumn = ({
                 order: order,
             },
         }).then((data) => {
-            setActiveList(data.data.getList);
-            //console.log(data.data.getList);
+            console.log(data);
+            //setActiveList(data.data.getList);
+            if (data.data.getList.taskss.length != 0) {
+                setActiveList((prevActiveList) => {
+                    return {
+                        idList: prevActiveList.idList,
+                        idClient: prevActiveList.idClient,
+                        listName: prevActiveList.listName,
+                        taskss: [...prevActiveList.taskss, ...data.data.getList.taskss],
+                    };
+                });
+                //console.log(data.data.getList.taskss.length);
+            }
         });
-    }
+    };
+
+    useEffect(() => {
+        if (!loading) paginatedTasks();
+        //console.log(currentTaskPage);
+    }, [currentTaskPage]);
 
     function changePaginatedLists() {
         //const offset = listsPerPage * (currentPage - 1);
@@ -180,13 +201,11 @@ const CenterColumn = ({
         //setCurrentPage(1);
     }
 
-    useEffect(() => {
-        //there was a error Leak Here
+    /* useEffect(() => {
         if (activeList) {
-            paginatedTasks();
+            changeListTasks();
         }
-    }, [currentTaskPage]);
-    //console.log(currentPage);
+    }, [currentTaskPage]); */
 
     function changeTotalTasks() {
         const { idList, idClient } = activeList;
@@ -246,7 +265,7 @@ const CenterColumn = ({
             .then((data) => {
                 if (data.data.updateList) {
                     //setActiveList(data.data.updateList);
-                    changePaginatedLists();
+                    changeListTasks();
                 } else {
                     console.log('something went wrong');
                 }
@@ -263,7 +282,7 @@ const CenterColumn = ({
                 console.log('something went wrong');
             } else {
                 //console.log(data.data);
-                paginatedTasks();
+                changeListTasks();
             }
         });
 
@@ -339,8 +358,8 @@ const CenterColumn = ({
                 console.log('something went wrong');
             } else {
                 //console.log(data.data);
-                //setTaskCurrentPage(1);
-                paginatedTasks();
+                //setCurrentTaskPage(1);
+                changeListTasks();
                 setChangeLayout(false);
             }
         });
@@ -478,7 +497,7 @@ const CenterColumn = ({
                             <Pagination
                                 listsPerPage={tasksPerPage}
                                 totalLists={totalTasks.getListsTotalTasks}
-                                setCurrentPage={setTaskCurrentPage}
+                                setCurrentPage={setCurrentTaskPage}
                             />
                         )}
                         {activeList && showAllTasks && !searchIsActive && (
@@ -557,20 +576,21 @@ const CenterColumn = ({
                     </BaseAdd>
                 )}
 
-                {/* console.log(activeList) */}
+                {/* console.log(setCurrentTotalTaskPage) */}
                 {listIsActive && !showAllTasks && !searchIsActive && (
                     <Tasks
-                        list={activeList.taskss}
+                        tasks={activeList.taskss}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
+                        setPage={setCurrentTaskPage}
                     />
                 )}
 
                 {listIsActive && showAllTasks && !searchIsActive && (
                     <Tasks
-                        list={allTasksList}
+                        tasks={allTasksList}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
@@ -580,7 +600,7 @@ const CenterColumn = ({
 
                 {listIsActive && !showAllTasks && searchIsActive && (
                     <Tasks
-                        list={searchedTasks}
+                        tasks={searchedTasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
@@ -658,6 +678,8 @@ CenterColumn.propTypes = {
     order: PropTypes.string,
     setOrder: PropTypes.func,
     setTotalLists: PropTypes.func,
+    currentTaskPage: PropTypes.number,
+    setCurrentTaskPage: PropTypes.func,
 };
 
 export default CenterColumn;

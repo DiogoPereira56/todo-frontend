@@ -27,6 +27,7 @@ const SideBar = ({
     order,
     setTotalLists,
     totalLists,
+    setCurrentTaskPage,
 }) => {
     //const { data: totalLists } = useQuery(GET_CLIENT_TOTAL_LISTS);
     const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
@@ -49,7 +50,7 @@ const SideBar = ({
 
     const doTotalLists = () => {
         getTotalLists().then((data) => {
-            console.log(data.data.getClientTotalLists);
+            //console.log(data.data.getClientTotalLists);
             setTotalLists(data.data.getClientTotalLists);
         });
     };
@@ -108,6 +109,7 @@ const SideBar = ({
                         orderByTitle={orderByTitle}
                         setSearchIsActive={setSearchIsActive}
                         order={order}
+                        setCurrentTaskPage={setCurrentTaskPage}
                     />
                 )}
 
@@ -157,6 +159,7 @@ SideBar.propTypes = {
     order: PropTypes.string,
     setTotalLists: PropTypes.func,
     totalLists: PropTypes.number,
+    setCurrentTaskPage: PropTypes.func,
 };
 
 export default SideBar;

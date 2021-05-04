@@ -4,6 +4,9 @@ const Container = styled.div`
     margin: auto;
     padding: 10px;
     background: #0e005e;
+
+    /* position: fixed;
+    margin-bottom: 30px; */
 `;
 
 const Navbar = styled.div`
