@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { PropTypes } from 'prop-types';
 import { UPDATE_TASK_COMPLETION_MUTATION } from '../../graphQL/Mutations';
@@ -7,12 +7,14 @@ import { Task, CheckBox, Content } from './CenterColumn.styles';
 
 const Tasks = ({
     tasks,
-    setTasks,
     setChangeLayout,
     changeLayout,
     setActiveTask,
     loggedIdClient,
     setPage,
+    currentPage,
+    loading,
+    hasMore,
 }) => {
     const [updateCompletion] = useMutation(UPDATE_TASK_COMPLETION_MUTATION);
 
@@ -68,12 +70,14 @@ const Tasks = ({
     }); */
 
     const observer = useRef();
-    const lastTaskRef = useCallback((node) => {
-        setTimeout(() => {
-            //if (loading) return
+    const lastTaskRef = useCallback(
+        (node) => {
+            /* setTimeout(() => { */
+            if (loading) return;
             if (observer.current) observer.current.disconnect();
             observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting /* && hasMore */) {
+                //console.log('task has more', hasMore);
+                if (entries[0].isIntersecting && hasMore > 0) {
                     //console.log('visible');
                     setPage((prevPage) => {
                         return prevPage + 1;
@@ -85,8 +89,10 @@ const Tasks = ({
             });
             if (node) observer.current.observe(node);
             //console.log(node);
-        }, 2500);
-    });
+            /* }, 1500); */
+        },
+        [loading, hasMore],
+    );
 
     if (tasks) {
         return (
@@ -117,7 +123,7 @@ const Tasks = ({
                             );
                         }
                     })}
-                    {/* <Task ref={lastTaskRef}>Loading...</Task> */}
+                    {/* loading && <Task ref={lastTaskRef}>Loading...</Task> */}
                 </Content>
             </div>
         );
@@ -128,12 +134,14 @@ const Tasks = ({
 
 Tasks.propTypes = {
     tasks: PropTypes.array,
-    setTasks: PropTypes.func,
     setChangeLayout: PropTypes.func,
     changeLayout: PropTypes.bool,
     setActiveTask: PropTypes.func,
     loggedIdClient: PropTypes.number,
     setPage: PropTypes.func,
+    loading: PropTypes.bool,
+    hasMore: PropTypes.number,
+    currentPage: PropTypes.number,
 };
 
 export default Tasks;

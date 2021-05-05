@@ -138,7 +138,7 @@ const CenterColumn = ({
 
     const paginatedTasks = () => {
         const { idList, idClient } = activeList;
-        console.log(currentTaskPage);
+        //console.log('page: ', currentTaskPage);
         const offset = tasksPerPage * (currentTaskPage - 1);
         //console.log(idList, idClient, tasksPerPage, offset, orderByTitle, order);
         //console.log(offset);
@@ -151,20 +151,27 @@ const CenterColumn = ({
                 orderByTitle: orderByTitle,
                 order: order,
             },
+            update(cache, { data: { getListTasks } }) {
+                console.log(cache);
+            },
         }).then((data) => {
-            console.log(data);
+            //console.log(data);
             //setActiveList(data.data.getList);
-            if (data.data.getList.taskss.length != 0) {
-                setActiveList((prevActiveList) => {
-                    return {
-                        idList: prevActiveList.idList,
-                        idClient: prevActiveList.idClient,
-                        listName: prevActiveList.listName,
-                        taskss: [...prevActiveList.taskss, ...data.data.getList.taskss],
-                    };
-                });
-                //console.log(data.data.getList.taskss.length);
-            }
+            /* if (data.data.getList.taskss.tasks.length != 0) { */
+            setActiveList((prevActiveList) => {
+                return {
+                    idList: prevActiveList.idList,
+                    idClient: prevActiveList.idClient,
+                    listName: prevActiveList.listName,
+                    taskss: {
+                        tasks: [...prevActiveList.taskss.tasks, ...data.data.getList.taskss.tasks],
+                        hasMore: data.data.getList.taskss.hasMore,
+                    },
+                };
+            });
+            //console.log(data.data);
+            //console.log('hasMore: ', data.data.getList.taskss.hasMore);
+            /* } */
         });
     };
 
@@ -576,19 +583,22 @@ const CenterColumn = ({
                     </BaseAdd>
                 )}
 
-                {/* console.log(setCurrentTotalTaskPage) */}
+                {/* console.log('column has more: ', activeList.taskss.hasMore) */}
                 {listIsActive && !showAllTasks && !searchIsActive && (
                     <Tasks
-                        tasks={activeList.taskss}
+                        tasks={activeList.taskss.tasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
                         setPage={setCurrentTaskPage}
+                        currentPage={currentTaskPage}
+                        loading={loading}
+                        hasMore={activeList.taskss.hasMore}
                     />
                 )}
 
-                {listIsActive && showAllTasks && !searchIsActive && (
+                {/* listIsActive && showAllTasks && !searchIsActive && (
                     <Tasks
                         tasks={allTasksList}
                         setChangeLayout={setChangeLayout}
@@ -606,7 +616,7 @@ const CenterColumn = ({
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
                     />
-                )}
+                ) */}
             </CenterBar>
 
             {changeLayout && (

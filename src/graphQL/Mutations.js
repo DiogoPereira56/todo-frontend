@@ -54,10 +54,13 @@ export const RENAME_LIST_MUTATION = gql`
             idList
             listName
             taskss(limit: $limit, offset: $offset, orderByTitle: $orderByTitle, order: $order) {
-                idTask
-                title
-                complete
-                description
+                tasks {
+                    idTask
+                    title
+                    complete
+                    description
+                }
+                hasMore
             }
         }
     }
@@ -77,10 +80,13 @@ export const LIST_INFO_MUTATION = gql`
             idClient
             listName
             taskss(limit: $limit, offset: $offset, orderByTitle: $orderByTitle, order: $order) {
-                idTask
-                title
-                complete
-                description
+                tasks {
+                    idTask
+                    title
+                    complete
+                    description
+                }
+                hasMore
             }
         }
     }

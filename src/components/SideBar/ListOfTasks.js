@@ -19,6 +19,7 @@ const ListOfTasks = ({
 
     function changeActiveList(list) {
         setShowAllTasks(false);
+        //console.log(list.idList, list.idClient);
         getListTasks({
             variables: {
                 idList: list.idList,
