@@ -30,7 +30,7 @@ import remove from '../../imgs/remove.png';
 import deleteTask from '../../imgs/deleteTask.png';
 import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
     DELETE_LIST_MUTATION,
     NEW_TASK_MUTATION,
@@ -44,12 +44,13 @@ import {
     UPDATE_TASK_TITLE_MUTATION,
     SEARCHED_TASKS_MUTATION,
     GET_CLIENT_TOTAL_LISTS,
+    UPDATE_TASK_COMPLETION_MUTATION,
 } from '../../graphQL/Mutations';
 import Tasks from './Tasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import Pagination from '../Pagination';
-import { GET_CLIENT_TOTAL_TASKS } from '../../graphQL/Queries';
+import { GET_CLIENT, GET_CLIENT_TOTAL_TASKS, GET_LIST_TASKS } from '../../graphQL/Queries';
 
 const CenterColumn = ({
     lists,
@@ -78,21 +79,242 @@ const CenterColumn = ({
     setTotalLists,
     currentTaskPage,
     setCurrentTaskPage,
+    dataClient,
+    refetchLists,
+    currentPage,
+    loadListInfo,
+    listInfo,
+    refetchTotalLists,
 }) => {
     const [listIsActive, setListIsActive] = useState(false);
     const [activeTask, setActiveTask] = useState();
     const [renameTask, setRenameTask] = useState(false);
     const [isAsc, setIsAsc] = useState(true);
     const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
-    const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION);
-    const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION);
-    const [newTask] = useMutation(NEW_TASK_MUTATION);
-    const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION);
-    const [updateTaskTitle] = useMutation(UPDATE_TASK_TITLE_MUTATION);
-    const [newName] = useMutation(RENAME_LIST_MUTATION);
+    const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION, {
+        update(cache, { data }) {
+            const existingLists = cache.readQuery({
+                query: GET_CLIENT,
+                variables: { limit: listsPerPage, offset: 0 },
+            });
+            /* const deletedList = existingLists.getClientInformation.list.filter(
+                (l) => l.idList == listInfo.listQuery.idList,
+            );
+            console.log(deletedList); */
+            cache.writeQuery({
+                query: GET_CLIENT,
+                data: {
+                    getClientInformation: [...existingLists?.getClientInformation.list],
+                },
+                variables: { limit: listsPerPage, offset: 0 },
+            });
+        },
+    });
+    const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION, {
+        update(cache, { data }) {
+            const existingTasks = cache.readQuery({
+                query: GET_LIST_TASKS,
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+            cache.writeQuery({
+                query: GET_LIST_TASKS,
+                data: {
+                    listQuery: {
+                        taskss: {
+                            tasks: [...existingTasks?.listQuery.taskss.tasks],
+                        },
+                    },
+                },
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+        },
+    });
+    const [newTask] = useMutation(NEW_TASK_MUTATION, {
+        update: (cache, { data }) => {
+            const newTask = data?.addTask;
+
+            const existingTasks = cache.readQuery({
+                query: GET_LIST_TASKS,
+                variables: {
+                    idList: newTask.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+            /* console.log(newTask);
+            console.log(existingTasks);
+            console.log(listInfo); */
+            cache.writeQuery({
+                query: GET_LIST_TASKS,
+                data: {
+                    listQuery: {
+                        taskss: {
+                            tasks: [...existingTasks?.listQuery.taskss.tasks, newTask],
+                        },
+                    },
+                },
+                variables: {
+                    idList: newTask.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+        },
+    });
+    const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION, {
+        update: (cache, { data }) => {
+            const newTask = data?.updateTaskDescription;
+            const oldList = cache.readQuery({
+                query: GET_LIST_TASKS,
+                variables: {
+                    idList: newTask.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+
+            let newList = [];
+            oldList.listQuery.taskss.tasks.forEach((t) => {
+                if (t.idTask != newTask.idTask) newList.push(t);
+                else newList.push(newTask);
+            });
+            //console.log(newList);
+            cache.writeQuery({
+                query: GET_LIST_TASKS,
+                data: {
+                    listQuery: { taskss: { tasks: [...newList] } },
+                },
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+        },
+    });
+    const [updateTaskTitle] = useMutation(UPDATE_TASK_TITLE_MUTATION, {
+        update: (cache, { data }) => {
+            const newTask = data?.updateTaskTitle;
+            const oldList = cache.readQuery({
+                query: GET_LIST_TASKS,
+                variables: {
+                    idList: newTask.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+
+            let newList = [];
+            oldList.listQuery.taskss.tasks.forEach((t) => {
+                if (t.idTask != newTask.idTask) newList.push(t);
+                else newList.push(newTask);
+            });
+            //console.log(newList);
+            cache.writeQuery({
+                query: GET_LIST_TASKS,
+                data: {
+                    listQuery: { taskss: { tasks: [...newList] } },
+                },
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+        },
+    });
+    const [updateCompletion] = useMutation(UPDATE_TASK_COMPLETION_MUTATION, {
+        update: (cache, { data }) => {
+            const newTask = data?.updateTaskCompletion;
+            const oldList = cache.readQuery({
+                query: GET_LIST_TASKS,
+                variables: {
+                    idList: newTask.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+
+            let newList = [];
+            oldList.listQuery.taskss.tasks.forEach((t) => {
+                if (t.idTask != newTask.idTask) newList.push(t);
+                else newList.push(newTask);
+            });
+            //console.log(newList);
+            cache.writeQuery({
+                query: GET_LIST_TASKS,
+                data: {
+                    listQuery: { taskss: { tasks: [...newList] } },
+                },
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+        },
+    });
+    const [newName] = useMutation(RENAME_LIST_MUTATION, {
+        update: (cache, { data }) => {
+            const newListFromResponse = data?.updateList;
+            cache.writeQuery({
+                query: GET_LIST_TASKS,
+                data: {
+                    listQuery: [newListFromResponse],
+                },
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: 13,
+                    offset: 0,
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
+        },
+    });
+    //console.log(listInfo);
     const [getSearchedTasks] = useMutation(SEARCHED_TASKS_MUTATION);
     const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
-
+    //Queries
     //Pagination States
     const { data: totalClientAllTasks } = useQuery(GET_CLIENT_TOTAL_TASKS);
     const [getClientAllTasks] = useMutation(ALL_CLIENT_TASKS_MUTATION);
@@ -152,7 +374,7 @@ const CenterColumn = ({
                 order: order,
             },
             update(cache, { data: { getListTasks } }) {
-                console.log(cache);
+                //console.log(cache);
             },
         }).then((data) => {
             //console.log(data);
@@ -175,10 +397,11 @@ const CenterColumn = ({
         });
     };
 
-    useEffect(() => {
+    //todo: uncomment this later
+    /* useEffect(() => {
         if (!loading) paginatedTasks();
         //console.log(currentTaskPage);
-    }, [currentTaskPage]);
+    }, [currentTaskPage]); */
 
     function changePaginatedLists() {
         //const offset = listsPerPage * (currentPage - 1);
@@ -205,6 +428,10 @@ const CenterColumn = ({
                 });
             }
         });
+        //new stuff
+        refetchLists({ variables: { offset: listsPerPage * (currentPage - 1) } });
+        getListInfo();
+        refetchTotalLists();
         //setCurrentPage(1);
     }
 
@@ -212,7 +439,25 @@ const CenterColumn = ({
         if (activeList) {
             changeListTasks();
         }
-    }, [currentTaskPage]); */
+    }, [currentTaskPage]);*/
+
+    const getListInfo = () => {
+        loadListInfo({
+            variables: {
+                idList: dataClient.list[0].idList,
+                idClient: dataClient.list[0].idClient,
+                limit: tasksPerPage,
+                offset: 0,
+                orderByTitle: orderByTitle,
+                order: order,
+            },
+        });
+    };
+
+    useEffect(() => {
+        getListInfo();
+    }, [currentPage]);
+    //console.log(listInfo);
 
     function changeTotalTasks() {
         const { idList, idClient } = activeList;
@@ -246,7 +491,9 @@ const CenterColumn = ({
         const { idList, idClient } = activeList;
         const list = { idList, idClient };
 
-        deleteList({ variables: list }).then((data) => {
+        deleteList({
+            variables: list,
+        }).then((data) => {
             if (!data.data) {
                 console.log('something went wrong');
             } else {
@@ -255,7 +502,7 @@ const CenterColumn = ({
                 setShowOptions(false);
             }
         });
-        console.log(lists);
+        //console.log(lists);
     };
 
     const handleRename = (values) => {
@@ -460,9 +707,11 @@ const CenterColumn = ({
                             </TasksToolbarTitleItem>
                         )}
 
-                        {activeList && !rename && !showAllTasks && !searchIsActive && (
+                        {listInfo && !rename && !showAllTasks && !searchIsActive && (
                             <TasksToolbarTitleItem>
-                                <H2 onClick={() => setShowOptions(!showOptions)}>{activeList.listName}</H2>
+                                <H2 onClick={() => setShowOptions(!showOptions)}>
+                                    {listInfo.listQuery.listName}
+                                </H2>
                             </TasksToolbarTitleItem>
                         )}
                         {activeList && rename && !showAllTasks && (
@@ -583,18 +832,18 @@ const CenterColumn = ({
                     </BaseAdd>
                 )}
 
-                {/* console.log('column has more: ', activeList.taskss.hasMore) */}
-                {listIsActive && !showAllTasks && !searchIsActive && (
+                {/* console.log(listInfo.listQuery.taskss.tasks) */}
+                {listIsActive && listInfo && !showAllTasks && !searchIsActive && (
                     <Tasks
-                        tasks={activeList.taskss.tasks}
+                        tasks={listInfo.listQuery.taskss.tasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
                         setPage={setCurrentTaskPage}
-                        currentPage={currentTaskPage}
                         loading={loading}
                         hasMore={activeList.taskss.hasMore}
+                        updateCompletion={updateCompletion}
                     />
                 )}
 
@@ -605,6 +854,7 @@ const CenterColumn = ({
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
+                        updateCompletion={updateCompletion}
                     />
                 )}
 
@@ -615,6 +865,7 @@ const CenterColumn = ({
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={loggedIdClient}
+                        updateCompletion={updateCompletion}
                     />
                 ) */}
             </CenterBar>
@@ -690,6 +941,12 @@ CenterColumn.propTypes = {
     setTotalLists: PropTypes.func,
     currentTaskPage: PropTypes.number,
     setCurrentTaskPage: PropTypes.func,
+    dataClient: PropTypes.object,
+    refetchLists: PropTypes.func,
+    currentPage: PropTypes.number,
+    loadListInfo: PropTypes.func,
+    listInfo: PropTypes.object,
+    refetchTotalLists: PropTypes.func,
 };
 
 export default CenterColumn;

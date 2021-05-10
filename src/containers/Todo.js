@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import '../fonts.css';
-import { Wrapper, NoList, H2, Unauthorized, A, P } from '../components/Todo.styles';
+import { Wrapper, NoList, H2, Unauthorized, A, P, FixPosition } from '../components/Todo.styles';
 import SimpleHeader from '../components/SimpleHeader.js';
 import CenterColumn from '../components/CenterColumn/CenterColumn.js';
 import SideBar from '../components/SideBar/SideBar.js';
 import TopNavbar from '../components/TopNavbar/TopNavbar.js';
-import { useMutation, useQuery } from '@apollo/client';
-import { GET_CLIENT_INFORMATION } from '../graphQL/Queries';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { GET_CLIENT, GET_CLIENT_INFORMATION, GET_LIST_TASKS, CLIENT_TOTAL_LISTS } from '../graphQL/Queries';
 import { useEffect, useState } from 'react';
 import {
     CLIENT_LISTS_MUTATION,
@@ -17,7 +17,7 @@ import {
 
 const Todo = () => {
     //Queries
-    const { error: errorAuth, loading: loadingAuth, data: dataClient } = useQuery(GET_CLIENT_INFORMATION);
+    //const { error: errorAuth, loading: loadingAuth, data: dataClient } = useQuery(GET_CLIENT_INFORMATION);
     //Mutations
     const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION, {
         onError() {
@@ -45,10 +45,24 @@ const Todo = () => {
     const [searchedTasks, setSearchedTasks] = useState();
     const [totalSearchedTasks, setTotalSearchedTasks] = useState(1);
     const [totalLists, setTotalLists] = useState(1);
+    const [listsOffset, setListsOffset] = useState(0);
     //Other States
     const [loggedIdClient, setLoggedIdClient] = useState();
     const [search, setSearch] = useState();
     const [order, setOrder] = useState('ASC');
+    //Queries
+    const { error: errorAuth, loading: loadingAuth, data: dataClient, refetch: refetchLists } = useQuery(
+        GET_CLIENT,
+        {
+            variables: { limit: listsPerPage, offset: listsOffset },
+        },
+    );
+    const [loadListInfo, { error: errorListInfo, loading: loadingListInfo, data: listInfo }] = useLazyQuery(
+        GET_LIST_TASKS,
+    );
+    const { error: errorTL, loading: loadingTL, data: dataTotalLists, refetch: refetchTotalLists } = useQuery(
+        CLIENT_TOTAL_LISTS,
+    );
 
     function changePaginatedLists() {
         const offset = listsPerPage * (currentPage - 1);
@@ -76,22 +90,6 @@ const Todo = () => {
             }
         });
     }
-
-    /* function searchTasks() {
-        const offset = tasksPerPage * (currentSearchedTasksPage - 1);
-        getSearchedTasks({
-            variables: {
-                limit: tasksPerPage,
-                offset: offset,
-                idClient: loggedIdClient,
-                orderByTitle: orderByTitle,
-                search: search,
-            },
-        }).then((data) => {
-            console.log(data.data.getSearchedTasks);
-            setSearchedTasks(data.data.getSearchedTasks);
-        });
-    } */
 
     const doTotalSearchedTasks = (values) => {
         getTotalSearchedTasks({ variables: { idClient: loggedIdClient, search: values.search } }).then(
@@ -126,7 +124,10 @@ const Todo = () => {
 
     useEffect(() => {
         changePaginatedLists();
+        setListsOffset(listsPerPage * (currentPage - 1));
+        refetchLists();
     }, [currentPage]);
+    //console.log(dataClient);
 
     return (
         <div>
@@ -144,15 +145,16 @@ const Todo = () => {
                 </div>
             )}
             {dataClient && (
-                <TopNavbar
-                    name={dataClient.getClientInformation.name}
-                    handleSearchedTasks={handleSearchedTasks}
-                />
+                <FixPosition>
+                    <TopNavbar
+                        name={dataClient.getClientInformation.name}
+                        handleSearchedTasks={handleSearchedTasks}
+                    />
+                </FixPosition>
             )}
-            {dataClient && (
+            {dataClient && dataTotalLists && (
                 <Wrapper>
                     <SideBar
-                        lists={paginatedLists}
                         setActiveList={setActiveList}
                         setChangeLayout={setChangeLayout}
                         setRename={setRename}
@@ -166,8 +168,11 @@ const Todo = () => {
                         setSearchIsActive={setSearchIsActive}
                         order={order}
                         setTotalLists={setTotalLists}
-                        totalLists={totalLists}
+                        totalLists={dataTotalLists.getTotalLists}
+                        refetchTotalLists={refetchTotalLists}
                         setCurrentTaskPage={setCurrentTaskPage}
+                        dataClient={dataClient.getClientInformation}
+                        loadListInfo={loadListInfo}
                     />
 
                     {!activeList && (
@@ -203,6 +208,12 @@ const Todo = () => {
                             setTotalLists={setTotalLists}
                             currentTaskPage={currentTaskPage}
                             setCurrentTaskPage={setCurrentTaskPage}
+                            dataClient={dataClient.getClientInformation}
+                            refetchLists={refetchLists}
+                            currentPage={currentPage}
+                            loadListInfo={loadListInfo}
+                            listInfo={listInfo}
+                            refetchTotalLists={refetchTotalLists}
                         />
                     )}
                 </Wrapper>

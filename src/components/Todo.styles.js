@@ -39,4 +39,9 @@ const P = styled.p`
     margin: 10px;
 `;
 
-export { Wrapper, NoList, H2, Unauthorized, A, P };
+const FixPosition = styled.div`
+    /* position: fixed;
+    margin-bottom: 200px; */
+`;
+
+export { Wrapper, NoList, H2, Unauthorized, A, P, FixPosition };

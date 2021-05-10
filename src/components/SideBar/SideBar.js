@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationPosition } from './SideBar.styles';
 import '../../fonts.css';
 import menu from '../../imgs/menu.png';
-import { useMutation } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import ListOfTasks from './ListOfTasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -10,9 +11,9 @@ import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION, GET_CLIENT_TOTAL_LISTS } from
 import { PropTypes } from 'prop-types';
 import Pagination from '../Pagination';
 import { useEffect } from 'react';
+import { GET_CLIENT, GET_CLIENT_INFORMATION } from '../../graphQL/Queries';
 
 const SideBar = ({
-    lists,
     setActiveList,
     setChangeLayout,
     setRename,
@@ -27,11 +28,32 @@ const SideBar = ({
     order,
     setTotalLists,
     totalLists,
+    refetchTotalLists,
     setCurrentTaskPage,
+    dataClient,
+    loadListInfo,
 }) => {
     //const { data: totalLists } = useQuery(GET_CLIENT_TOTAL_LISTS);
     const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
-    const [makeNewList, { errorNewList }] = useMutation(NEW_LIST_MUTATION);
+
+    const [makeNewList, { error: errorNewList }] = useMutation(NEW_LIST_MUTATION, {
+        update: (cache, { data }) => {
+            const newListFromResponse = data?.addList;
+            const existingLists = cache.readQuery({
+                query: GET_CLIENT,
+                variables: { limit: listsPerPage, offset: 0 },
+            });
+            console.log(existingLists);
+
+            cache.writeQuery({
+                query: GET_CLIENT,
+                data: {
+                    getClientInformation: [...existingLists?.getClientInformation.list, newListFromResponse],
+                },
+                variables: { limit: listsPerPage, offset: 0 },
+            });
+        },
+    });
     const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
     //todo: try and change 'refetch', to 'cache'
     //const {error, loading, data, refetch} = useQuery(GET_ALL_LISTS);
@@ -59,16 +81,19 @@ const SideBar = ({
         doTotalLists();
     }, []);
 
+    //console.log(dataClient);
     const handleNewList = (values) => {
         makeNewList({ variables: values }).then((data) => {
             if (!data.data) {
                 console.log('something went wrong');
             } else {
                 //console.log(data.data);
-                doTotalLists();
-                changePaginatedLists();
+                /* doTotalLists();
+                    changePaginatedLists(); */
+                refetchTotalLists();
             }
         });
+        //.then(console.log(dataClient));
         values.listName = '';
     };
 
@@ -79,6 +104,7 @@ const SideBar = ({
     }
 
     if (errorNewList) {
+        console.log(errorNewList);
         return <div>error...</div>;
     }
 
@@ -98,9 +124,9 @@ const SideBar = ({
                     </Li>
                 </Ul>
 
-                {lists && (
+                {dataClient && (
                     <ListOfTasks
-                        lists={lists}
+                        lists={dataClient.list}
                         setActiveList={setActiveList}
                         setChangeLayout={setChangeLayout}
                         setRename={setRename}
@@ -110,6 +136,7 @@ const SideBar = ({
                         setSearchIsActive={setSearchIsActive}
                         order={order}
                         setCurrentTaskPage={setCurrentTaskPage}
+                        loadListInfo={loadListInfo}
                     />
                 )}
 
@@ -137,13 +164,14 @@ const SideBar = ({
                         />
                     </PaginationPosition>
                 )}
+
+                {/* dataClient && dataClient.list.map((list) => <P key={list.idList}>{list.listName}</P>) */}
             </SideBar2>
         </Wrapper>
     );
 };
 
 SideBar.propTypes = {
-    lists: PropTypes.array,
     setActiveList: PropTypes.func,
     lista: PropTypes.object,
     setChangeLayout: PropTypes.func,
@@ -159,7 +187,10 @@ SideBar.propTypes = {
     order: PropTypes.string,
     setTotalLists: PropTypes.func,
     totalLists: PropTypes.number,
+    refetchTotalLists: PropTypes.func,
     setCurrentTaskPage: PropTypes.func,
+    dataClient: PropTypes.object,
+    loadListInfo: PropTypes.func,
 };
 
 export default SideBar;

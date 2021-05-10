@@ -12,12 +12,10 @@ const Tasks = ({
     setActiveTask,
     loggedIdClient,
     setPage,
-    currentPage,
     loading,
     hasMore,
+    updateCompletion,
 }) => {
-    const [updateCompletion] = useMutation(UPDATE_TASK_COMPLETION_MUTATION);
-
     const show = (task) => {
         setActiveTask(task);
         setChangeLayout(!changeLayout);
@@ -141,7 +139,7 @@ Tasks.propTypes = {
     setPage: PropTypes.func,
     loading: PropTypes.bool,
     hasMore: PropTypes.number,
-    currentPage: PropTypes.number,
+    updateCompletion: PropTypes.func,
 };
 
 export default Tasks;

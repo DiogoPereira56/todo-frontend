@@ -14,11 +14,11 @@ const ListOfTasks = ({
     setSearchIsActive,
     order,
     setCurrentTaskPage,
+    loadListInfo,
 }) => {
     const [getListTasks] = useMutation(LIST_INFO_MUTATION);
 
     function changeActiveList(list) {
-        setShowAllTasks(false);
         //console.log(list.idList, list.idClient);
         getListTasks({
             variables: {
@@ -35,11 +35,23 @@ const ListOfTasks = ({
                 //console.log(data.data.getList);
             }
         });
+
+        loadListInfo({
+            variables: {
+                idList: list.idList,
+                idClient: list.idClient,
+                limit: 13,
+                offset: 0,
+                orderByTitle: orderByTitle,
+                order: order,
+            },
+        });
     }
 
     const makeActiveList = (list) => {
         //setActiveList(list);
         changeActiveList(list);
+        setShowAllTasks(false);
         setChangeLayout(false);
         setRename(false);
         setShowOptions(false);
@@ -69,6 +81,7 @@ ListOfTasks.propTypes = {
     setSearchIsActive: PropTypes.func,
     order: PropTypes.string,
     setCurrentTaskPage: PropTypes.func,
+    loadListInfo: PropTypes.func,
 };
 
 export default ListOfTasks;

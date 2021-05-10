@@ -29,8 +29,12 @@ export const CLIENT_LISTS_MUTATION = gql`
 
 //List actions
 export const NEW_LIST_MUTATION = gql`
-    mutation addNewList($listName: String!) {
-        addList(listName: $listName)
+    mutation($listName: String!) {
+        addList(listName: $listName) {
+            idList
+            idClient
+            listName
+        }
     }
 `;
 
@@ -43,14 +47,14 @@ export const DELETE_LIST_MUTATION = gql`
 export const RENAME_LIST_MUTATION = gql`
     mutation newList(
         $idList: Float!
-        $title: String!
+        $listName: String!
         $idClient: Float!
         $limit: Float!
         $offset: Float!
         $orderByTitle: Boolean!
         $order: String!
     ) {
-        updateList(idList: $idList, title: $title, idClient: $idClient) {
+        updateList(idList: $idList, listName: $listName, idClient: $idClient) {
             idList
             listName
             taskss(limit: $limit, offset: $offset, orderByTitle: $orderByTitle, order: $order) {
@@ -121,6 +125,7 @@ export const UPDATE_TASK_DESCRIPTION_MUTATION = gql`
     mutation($idTask: Float!, $description: String!, $idClient: Float!) {
         updateTaskDescription(idTask: $idTask, description: $description, idClient: $idClient) {
             idTask
+            idList
             title
             complete
             description
@@ -132,6 +137,7 @@ export const UPDATE_TASK_TITLE_MUTATION = gql`
     mutation($idTask: Float!, $title: String!, $idClient: Float!) {
         updateTaskTitle(idTask: $idTask, title: $title, idClient: $idClient) {
             idTask
+            idList
             title
             complete
             description
