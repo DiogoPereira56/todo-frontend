@@ -29,8 +29,7 @@ const P = styled.p`
 `;
 
 const FixPosition = styled.div`
-    /* position: fixed;
-    margin-bottom: 200px; */
+    //margin-bottom: 200px;
 `;
 
 export { Wrapper, Unauthorized, A, P, FixPosition };

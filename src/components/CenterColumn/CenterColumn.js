@@ -353,7 +353,6 @@ const CenterColumn = ({
         //console.log(idList, idClient, tasksPerPage, offset, orderByTitle, order);
         try {
             fetchMoreListInfo({
-                query: GET_LIST_TASKS,
                 variables: {
                     idList: idList,
                     idClient: idClient,
@@ -386,11 +385,11 @@ const CenterColumn = ({
         }
     };
 
-    //todo: uncomment this later
     useEffect(() => {
         if (!loadingListInfo && listInfo) paginatedTasks();
         //console.log(currentTaskPage);
     }, [currentTaskPage]);
+    //console.log(listInfo);
 
     function changePaginatedLists() {
         refetchLists({ variables: { limit: listsPerPage, offset: 0 } });

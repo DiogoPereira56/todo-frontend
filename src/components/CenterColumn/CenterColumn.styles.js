@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
 //Wrapper that wrapps the rest of the code
-const CenterBar = styled.div``;
+const CenterBar = styled.div`
+    //width: 100%;
+`;
 const TasksToolbar = styled.div`
     padding: 12px 16px 0 16px;
     display: flex;
@@ -9,6 +11,9 @@ const TasksToolbar = styled.div`
 const Wrapper = styled.div`
     display: flex;
     flex: 1 1 0px;
+    margin-top: 52px;
+    position: relative;
+    z-index: 99;
 `;
 //Description Bar
 const DescriptionContainer = styled.div`

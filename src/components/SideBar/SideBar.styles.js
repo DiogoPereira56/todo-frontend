@@ -4,6 +4,7 @@ const Wrapper = styled.div`
     display: flex;
     position: relative;
     margin-right: 290px;
+    margin-top: 52px;
 `;
 const SideBar2 = styled.div`
     width: 290px;

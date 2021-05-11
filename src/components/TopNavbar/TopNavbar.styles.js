@@ -4,9 +4,11 @@ const Container = styled.div`
     margin: auto;
     padding: 10px;
     background: #0e005e;
-
-    /* position: fixed;
-    margin-bottom: 30px; */
+    height: 52px;
+    position: fixed;
+    z-index: 999;
+    width: 100%;
+    //margin-bottom: 30px;
 `;
 
 const Navbar = styled.div`

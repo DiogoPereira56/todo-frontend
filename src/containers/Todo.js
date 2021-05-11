@@ -96,12 +96,10 @@ const Todo = () => {
                 </div>
             )}
             {dataClient && (
-                <FixPosition>
-                    <TopNavbar
-                        name={dataClient.getClientInformation.name}
-                        handleSearchedTasks={handleSearchedTasks}
-                    />
-                </FixPosition>
+                <TopNavbar
+                    name={dataClient.getClientInformation.name}
+                    handleSearchedTasks={handleSearchedTasks}
+                />
             )}
             {dataClient && dataTotalLists && (
                 <Wrapper>
