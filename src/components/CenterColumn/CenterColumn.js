@@ -31,25 +31,27 @@ import remove from '../../imgs/remove.png';
 import deleteTask from '../../imgs/deleteTask.png';
 import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import {
     DELETE_LIST_MUTATION,
     NEW_TASK_MUTATION,
     RENAME_LIST_MUTATION,
     UPDATE_TASK_DESCRIPTION_MUTATION,
     DELETE_TASK_MUTATION,
-    LIST_TOTAL_TASK_MUTATION,
-    ALL_CLIENT_TASKS_MUTATION,
     UPDATE_TASK_TITLE_MUTATION,
-    SEARCHED_TASKS_MUTATION,
-    GET_CLIENT_TOTAL_LISTS,
     UPDATE_TASK_COMPLETION_MUTATION,
 } from '../../graphQL/Mutations';
 import Tasks from './Tasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import Pagination from '../Pagination';
-import { GET_CLIENT, GET_CLIENT_TOTAL_TASKS, GET_LIST_TASKS } from '../../graphQL/Queries';
+import {
+    ALL_CLIENT_TASKS,
+    CLIENT_TOTAL_LISTS,
+    GET_CLIENT,
+    GET_CLIENT_TOTAL_TASKS,
+    GET_LIST_TASKS,
+} from '../../graphQL/Queries';
 
 const CenterColumn = ({
     setChangeLayout,
@@ -65,12 +67,11 @@ const CenterColumn = ({
     currentSearchedTasksPage,
     searchIsActive,
     search,
-    setSearchedTasks,
+    loadSearchedTasks,
     setCurrentSearchedTasksPage,
     totalSearchedTasks,
     order,
     setOrder,
-    setTotalLists,
     currentTaskPage,
     setCurrentTaskPage,
     dataClient,
@@ -78,12 +79,10 @@ const CenterColumn = ({
     currentPage,
     loadListInfo,
     listInfo,
-    refetchTotalLists,
     loadingListInfo,
 }) => {
     const [renameTask, setRenameTask] = useState(false);
     const [isAsc, setIsAsc] = useState(true);
-    const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
     const [deleteList, { error: errorDelete }] = useMutation(DELETE_LIST_MUTATION, {
         update(cache, { data }) {
             const existingLists = cache.readQuery({
@@ -96,6 +95,15 @@ const CenterColumn = ({
                     getClientInformation: [...existingLists?.getClientInformation.list],
                 },
                 variables: { limit: listsPerPage, offset: 0 },
+            });
+            let numLists = cache.readQuery({
+                query: CLIENT_TOTAL_LISTS,
+            });
+            cache.writeQuery({
+                query: CLIENT_TOTAL_LISTS,
+                data: {
+                    getTotalLists: numLists.getTotalLists - 1,
+                },
             });
         },
     });
@@ -302,24 +310,20 @@ const CenterColumn = ({
             });
         },
     });
-    //console.log(listInfo);
-    const [getSearchedTasks] = useMutation(SEARCHED_TASKS_MUTATION);
-    const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
     //Queries
     //Pagination States
     const { data: totalClientAllTasks } = useQuery(GET_CLIENT_TOTAL_TASKS);
-    const [getClientAllTasks] = useMutation(ALL_CLIENT_TASKS_MUTATION);
-    //const [currentTaskPage, setCurrentTaskPage] = useState(1);
+    const [loadAllTasks, { loading: loadingAllTasks, data: allTasksList }] = useLazyQuery(ALL_CLIENT_TASKS);
+
     const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
     const [tasksPerPage] = useState(13);
     const [totalTasks, setTotalTasks] = useState(1);
     const [listsPerPage] = useState(10);
-    const [allTasksList, setAllTasksList] = useState();
     const [activeTask, setActiveTask] = useState();
 
     function changeClientAllTasks() {
         const offset = tasksPerPage * (currentTotalTaskPage - 1);
-        getClientAllTasks({
+        loadAllTasks({
             variables: {
                 limit: tasksPerPage,
                 offset: offset,
@@ -327,11 +331,6 @@ const CenterColumn = ({
                 orderByTitle: orderByTitle,
                 order: order,
             },
-        }).then((data) => {
-            if (data.data.getAllTasks) {
-                //console.log(data.data.getAllTasks)
-                setAllTasksList(data.data.getAllTasks);
-            }
         });
     }
 
@@ -392,9 +391,8 @@ const CenterColumn = ({
     }, [currentTaskPage]); */
 
     function changePaginatedLists() {
-        refetchLists({ variables: { offset: listsPerPage * (currentPage - 1) } });
+        refetchLists({ variables: { limit: listsPerPage, offset: 0 } });
         getListInfo();
-        refetchTotalLists();
     }
 
     /* useEffect(() => {
@@ -434,24 +432,14 @@ const CenterColumn = ({
         return <div>{errorDelete}</div>;
     }
 
-    const doTotalLists = () => {
-        getTotalLists().then((data) => {
-            //console.log(data.data.getClientTotalLists);
-            setTotalLists(data.data.getClientTotalLists);
-        });
-    };
-
     const removeList = () => {
         //const { idList, idClient } = listInfo.listQuery;
         const list = { idList: listInfo.listQuery.idList, idClient: listInfo.listQuery.idClient };
         deleteList({
             variables: list,
-        }).then((data) => {
-            if (data.data) {
-                doTotalLists();
-                changePaginatedLists(); //keep this
-                setShowOptions(false);
-            }
+        }).then(() => {
+            changePaginatedLists(); //keep this
+            setShowOptions(false);
         });
     };
 
@@ -535,7 +523,7 @@ const CenterColumn = ({
 
     const searchTasks = () => {
         const offset = tasksPerPage * (currentSearchedTasksPage - 1);
-        getSearchedTasks({
+        loadSearchedTasks({
             variables: {
                 limit: tasksPerPage,
                 offset: offset,
@@ -544,9 +532,6 @@ const CenterColumn = ({
                 search: search,
                 order: order,
             },
-        }).then((data) => {
-            //console.log(data.data.getSearchedTasks);
-            setSearchedTasks(data.data.getSearchedTasks);
         });
     };
 
@@ -683,10 +668,10 @@ const CenterColumn = ({
                                 setCurrentPage={setCurrentTotalTaskPage}
                             />
                         )}
-                        {listInfo && !showAllTasks && searchIsActive && (
+                        {listInfo && !showAllTasks && searchIsActive && totalSearchedTasks && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
-                                totalLists={totalSearchedTasks}
+                                totalLists={totalSearchedTasks.getTotalSearchedTasks}
                                 setCurrentPage={setCurrentSearchedTasksPage}
                             />
                         )}
@@ -770,27 +755,33 @@ const CenterColumn = ({
                     />
                 )}
 
-                {/* listInfo && showAllTasks && !searchIsActive && (
+                {allTasksList && showAllTasks && !searchIsActive && (
                     <Tasks
-                        tasks={allTasksList}
+                        tasks={allTasksList.getAllTasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
+                        //setPage={}
+                        //loading={}
+                        //hasMore={}
                         updateCompletion={updateCompletion}
                     />
                 )}
 
-                {listInfo && !showAllTasks && searchIsActive && (
+                {searchedTasks && !showAllTasks && searchIsActive && (
                     <Tasks
-                        tasks={searchedTasks}
+                        tasks={searchedTasks.getSearchedTasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
+                        //setPage={}
+                        //loading={}
+                        //hasMore={}
                         updateCompletion={updateCompletion}
                     />
-                ) */}
+                )}
             </CenterBar>
 
             {changeLayout && (
@@ -849,16 +840,15 @@ CenterColumn.propTypes = {
     showAllTasks: PropTypes.bool,
     setOrderByTitle: PropTypes.func,
     orderByTitle: PropTypes.bool,
-    searchedTasks: PropTypes.array,
+    searchedTasks: PropTypes.object,
     currentSearchedTasksPage: PropTypes.number,
     searchIsActive: PropTypes.bool,
     search: PropTypes.string,
-    setSearchedTasks: PropTypes.func,
+    loadSearchedTasks: PropTypes.func,
     setCurrentSearchedTasksPage: PropTypes.func,
-    totalSearchedTasks: PropTypes.number,
+    totalSearchedTasks: PropTypes.object,
     order: PropTypes.string,
     setOrder: PropTypes.func,
-    setTotalLists: PropTypes.func,
     currentTaskPage: PropTypes.number,
     setCurrentTaskPage: PropTypes.func,
     dataClient: PropTypes.object,
@@ -866,7 +856,6 @@ CenterColumn.propTypes = {
     currentPage: PropTypes.number,
     loadListInfo: PropTypes.func,
     listInfo: PropTypes.object,
-    refetchTotalLists: PropTypes.func,
     loadingListInfo: PropTypes.bool,
 };
 

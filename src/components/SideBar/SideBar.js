@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
 import { PropTypes } from 'prop-types';
 import Pagination from '../Pagination';
-import { GET_CLIENT } from '../../graphQL/Queries';
+import { CLIENT_TOTAL_LISTS, GET_CLIENT } from '../../graphQL/Queries';
 
 const SideBar = ({
     setChangeLayout,
@@ -22,7 +22,6 @@ const SideBar = ({
     setSearchIsActive,
     order,
     totalLists,
-    refetchTotalLists,
     setCurrentTaskPage,
     dataClient,
     loadListInfo,
@@ -34,7 +33,7 @@ const SideBar = ({
                 query: GET_CLIENT,
                 variables: { limit: listsPerPage, offset: 0 },
             });
-            console.log(existingLists);
+            //console.log(existingLists);
 
             cache.writeQuery({
                 query: GET_CLIENT,
@@ -43,11 +42,20 @@ const SideBar = ({
                 },
                 variables: { limit: listsPerPage, offset: 0 },
             });
+            let numLists = cache.readQuery({
+                query: CLIENT_TOTAL_LISTS,
+            });
+            cache.writeQuery({
+                query: CLIENT_TOTAL_LISTS,
+                data: {
+                    getTotalLists: numLists.getTotalLists + 1,
+                },
+            });
         },
     });
 
     const handleNewList = (values) => {
-        makeNewList({ variables: values }).then(refetchTotalLists());
+        makeNewList({ variables: values });
         values.listName = '';
     };
 
@@ -133,7 +141,6 @@ SideBar.propTypes = {
     setSearchIsActive: PropTypes.func,
     order: PropTypes.string,
     totalLists: PropTypes.number,
-    refetchTotalLists: PropTypes.func,
     setCurrentTaskPage: PropTypes.func,
     dataClient: PropTypes.object,
     loadListInfo: PropTypes.func,

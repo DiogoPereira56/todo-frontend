@@ -89,3 +89,50 @@ export const GET_LIST_TASKS = gql`
         }
     }
 `;
+export const ALL_CLIENT_TASKS = gql`
+    query($limit: Float!, $offset: Float!, $idClient: Float!, $orderByTitle: Boolean!, $order: String!) {
+        getAllTasks(
+            limit: $limit
+            offset: $offset
+            idClient: $idClient
+            orderByTitle: $orderByTitle
+            order: $order
+        ) {
+            idTask
+            idList
+            title
+            complete
+            description
+        }
+    }
+`;
+export const SEARCHED_TASKS = gql`
+    query(
+        $limit: Float!
+        $offset: Float!
+        $idClient: Float!
+        $orderByTitle: Boolean!
+        $search: String!
+        $order: String!
+    ) {
+        getSearchedTasks(
+            limit: $limit
+            offset: $offset
+            idClient: $idClient
+            orderByTitle: $orderByTitle
+            search: $search
+            order: $order
+        ) {
+            idTask
+            idList
+            title
+            complete
+            description
+        }
+    }
+`;
+export const TOTAL_SEARCHED_TASKS = gql`
+    query($idClient: Float!, $search: String!) {
+        getTotalSearchedTasks(idClient: $idClient, search: $search)
+    }
+`;

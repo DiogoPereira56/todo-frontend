@@ -5,15 +5,22 @@ import SimpleHeader from '../components/SimpleHeader.js';
 import CenterColumn from '../components/CenterColumn/CenterColumn.js';
 import SideBar from '../components/SideBar/SideBar.js';
 import TopNavbar from '../components/TopNavbar/TopNavbar.js';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { GET_CLIENT, GET_LIST_TASKS, CLIENT_TOTAL_LISTS } from '../graphQL/Queries';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import {
+    GET_CLIENT,
+    GET_LIST_TASKS,
+    CLIENT_TOTAL_LISTS,
+    SEARCHED_TASKS,
+    TOTAL_SEARCHED_TASKS,
+} from '../graphQL/Queries';
 import { useEffect, useState } from 'react';
-import { SEARCHED_TASKS_MUTATION, TOTAL_SEARCHED_TASKS_MUTATION } from '../graphQL/Mutations';
 
 const Todo = () => {
     //Mutations
-    const [getSearchedTasks] = useMutation(SEARCHED_TASKS_MUTATION);
-    const [getTotalSearchedTasks] = useMutation(TOTAL_SEARCHED_TASKS_MUTATION);
+    const [loadSearchedTasks, { loading: loadingSearchedTasks, data: searchedTasks }] = useLazyQuery(
+        SEARCHED_TASKS,
+    );
+    const [loadTotalSearchedTasks, { data: totalSearchedTasks }] = useLazyQuery(TOTAL_SEARCHED_TASKS);
     //Layout states
     const [showOptions, setShowOptions] = useState(false);
     const [rename, setRename] = useState(false);
@@ -27,9 +34,6 @@ const Todo = () => {
     const [listsPerPage] = useState(10);
     const [tasksPerPage] = useState(13);
     const [currentSearchedTasksPage, setCurrentSearchedTasksPage] = useState(1);
-    const [searchedTasks, setSearchedTasks] = useState();
-    const [totalSearchedTasks, setTotalSearchedTasks] = useState(1);
-    const [totalLists, setTotalLists] = useState(1);
     //Other States
     const [search, setSearch] = useState();
     const [order, setOrder] = useState('ASC');
@@ -43,16 +47,11 @@ const Todo = () => {
     const [loadListInfo, { error: errorListInfo, loading: loadingListInfo, data: listInfo }] = useLazyQuery(
         GET_LIST_TASKS,
     );
-    const { error: errorTL, loading: loadingTL, data: dataTotalLists, refetch: refetchTotalLists } = useQuery(
-        CLIENT_TOTAL_LISTS,
-    );
+    const { error: errorTL, loading: loadingTL, data: dataTotalLists } = useQuery(CLIENT_TOTAL_LISTS);
 
     const doTotalSearchedTasks = (values) => {
-        getTotalSearchedTasks({
+        loadTotalSearchedTasks({
             variables: { idClient: dataClient.getClientInformation.idClient, search: values.search },
-        }).then((data) => {
-            //console.log(data.data.getTotalSearchedTasks);
-            setTotalSearchedTasks(data.data.getTotalSearchedTasks);
         });
     };
 
@@ -60,7 +59,7 @@ const Todo = () => {
         setCurrentSearchedTasksPage(1);
         setSearch(values.search);
         const offset = tasksPerPage * (currentSearchedTasksPage - 1);
-        getSearchedTasks({
+        loadSearchedTasks({
             variables: {
                 limit: tasksPerPage,
                 offset: offset,
@@ -69,9 +68,6 @@ const Todo = () => {
                 search: values.search,
                 order: order,
             },
-        }).then((data) => {
-            //console.log(data.data.getSearchedTasks);
-            setSearchedTasks(data.data.getSearchedTasks);
         });
         setSearchIsActive(true);
         setShowAllTasks(false);
@@ -119,7 +115,6 @@ const Todo = () => {
                         setSearchIsActive={setSearchIsActive}
                         order={order}
                         totalLists={dataTotalLists.getTotalLists}
-                        refetchTotalLists={refetchTotalLists}
                         setCurrentTaskPage={setCurrentTaskPage}
                         dataClient={dataClient.getClientInformation}
                         loadListInfo={loadListInfo}
@@ -140,12 +135,11 @@ const Todo = () => {
                             currentSearchedTasksPage={currentSearchedTasksPage}
                             searchIsActive={searchIsActive}
                             search={search}
-                            setSearchedTasks={setSearchedTasks}
+                            loadSearchedTasks={loadSearchedTasks}
                             setCurrentSearchedTasksPage={setCurrentSearchedTasksPage}
                             totalSearchedTasks={totalSearchedTasks}
                             order={order}
                             setOrder={setOrder}
-                            setTotalLists={setTotalLists}
                             currentTaskPage={currentTaskPage}
                             setCurrentTaskPage={setCurrentTaskPage}
                             dataClient={dataClient.getClientInformation}
@@ -153,7 +147,6 @@ const Todo = () => {
                             currentPage={currentPage}
                             loadListInfo={loadListInfo}
                             listInfo={listInfo}
-                            refetchTotalLists={refetchTotalLists}
                             loadingListInfo={loadingListInfo}
                         />
                     )}
