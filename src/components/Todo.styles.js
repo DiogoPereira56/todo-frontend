@@ -9,17 +9,6 @@ const Wrapper = styled.div`
     position: relative;
 `;
 
-const NoList = styled.div`
-    text-align: center;
-    margin-top: 300px;
-    width: 100%;
-    //border: 2px solid black;
-`;
-
-const H2 = styled.h2`
-    color: blue;
-`;
-
 const Unauthorized = styled.div`
     border: 2px solid #eee;
     margin-top: 130px;
@@ -44,4 +33,4 @@ const FixPosition = styled.div`
     margin-bottom: 200px; */
 `;
 
-export { Wrapper, NoList, H2, Unauthorized, A, P, FixPosition };
+export { Wrapper, Unauthorized, A, P, FixPosition };

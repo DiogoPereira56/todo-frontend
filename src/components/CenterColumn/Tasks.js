@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useRef, useCallback, useState } from 'react';
-import { useMutation } from '@apollo/client';
 import { PropTypes } from 'prop-types';
-import { UPDATE_TASK_COMPLETION_MUTATION } from '../../graphQL/Mutations';
 import { Task, CheckBox, Content } from './CenterColumn.styles';
 
 const Tasks = ({

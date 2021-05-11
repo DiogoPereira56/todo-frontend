@@ -142,6 +142,13 @@ const Actions = styled.div`
     }
 `;
 
+const NoList = styled.div`
+    text-align: center;
+    margin-top: 300px;
+    width: 100%;
+    //border: 2px solid black;
+`;
+
 export {
     CenterBar,
     TasksToolbar,
@@ -165,4 +172,5 @@ export {
     Actions,
     ListInput,
     Content,
+    NoList,
 };

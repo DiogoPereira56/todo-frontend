@@ -56,6 +56,7 @@ export const RENAME_LIST_MUTATION = gql`
     ) {
         updateList(idList: $idList, listName: $listName, idClient: $idClient) {
             idList
+            idClient
             listName
             taskss(limit: $limit, offset: $offset, orderByTitle: $orderByTitle, order: $order) {
                 tasks {

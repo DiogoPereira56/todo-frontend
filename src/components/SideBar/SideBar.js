@@ -2,40 +2,31 @@
 import { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationPosition } from './SideBar.styles';
 import '../../fonts.css';
 import menu from '../../imgs/menu.png';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import ListOfTasks from './ListOfTasks';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import { NEW_LIST_MUTATION, CLIENT_LISTS_MUTATION, GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Mutations';
-//import { GET_CLIENT_TOTAL_LISTS } from '../../graphQL/Queries';
+import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
 import { PropTypes } from 'prop-types';
 import Pagination from '../Pagination';
-import { useEffect } from 'react';
-import { GET_CLIENT, GET_CLIENT_INFORMATION } from '../../graphQL/Queries';
+import { GET_CLIENT } from '../../graphQL/Queries';
 
 const SideBar = ({
-    setActiveList,
     setChangeLayout,
     setRename,
     setShowOptions,
     setCurrentPage,
-    currentPage,
     listsPerPage,
-    setPaginatedLists,
     setShowAllTasks,
     orderByTitle,
     setSearchIsActive,
     order,
-    setTotalLists,
     totalLists,
     refetchTotalLists,
     setCurrentTaskPage,
     dataClient,
     loadListInfo,
 }) => {
-    //const { data: totalLists } = useQuery(GET_CLIENT_TOTAL_LISTS);
-    const [getTotalLists] = useMutation(GET_CLIENT_TOTAL_LISTS);
-
     const [makeNewList, { error: errorNewList }] = useMutation(NEW_LIST_MUTATION, {
         update: (cache, { data }) => {
             const newListFromResponse = data?.addList;
@@ -54,46 +45,9 @@ const SideBar = ({
             });
         },
     });
-    const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
-    //todo: try and change 'refetch', to 'cache'
-    //const {error, loading, data, refetch} = useQuery(GET_ALL_LISTS);
 
-    function changePaginatedLists() {
-        const offset = listsPerPage * (currentPage - 1);
-        getClientLists({ variables: { limit: listsPerPage, offset: offset } }).then((data) => {
-            if (!data.data) {
-                console.log('something went wrong');
-            } else {
-                //console.log(data.data.getClientInformations.list)
-                setPaginatedLists(data.data.getClientInformations.list);
-            }
-        });
-    }
-
-    const doTotalLists = () => {
-        getTotalLists().then((data) => {
-            //console.log(data.data.getClientTotalLists);
-            setTotalLists(data.data.getClientTotalLists);
-        });
-    };
-
-    useEffect(() => {
-        doTotalLists();
-    }, []);
-
-    //console.log(dataClient);
     const handleNewList = (values) => {
-        makeNewList({ variables: values }).then((data) => {
-            if (!data.data) {
-                console.log('something went wrong');
-            } else {
-                //console.log(data.data);
-                /* doTotalLists();
-                    changePaginatedLists(); */
-                refetchTotalLists();
-            }
-        });
-        //.then(console.log(dataClient));
+        makeNewList({ variables: values }).then(refetchTotalLists());
         values.listName = '';
     };
 
@@ -127,7 +81,6 @@ const SideBar = ({
                 {dataClient && (
                     <ListOfTasks
                         lists={dataClient.list}
-                        setActiveList={setActiveList}
                         setChangeLayout={setChangeLayout}
                         setRename={setRename}
                         setShowOptions={setShowOptions}
@@ -153,19 +106,15 @@ const SideBar = ({
                     )}
                 </Formik>
 
-                {/* console.log(totalLists) */}
                 {totalLists && (
                     <PaginationPosition>
                         <Pagination
                             listsPerPage={listsPerPage}
-                            //totalLists={totalLists.getClientTotalLists}
                             totalLists={totalLists}
                             setCurrentPage={setCurrentPage}
                         />
                     </PaginationPosition>
                 )}
-
-                {/* dataClient && dataClient.list.map((list) => <P key={list.idList}>{list.listName}</P>) */}
             </SideBar2>
         </Wrapper>
     );
@@ -178,14 +127,11 @@ SideBar.propTypes = {
     setRename: PropTypes.func,
     setShowOptions: PropTypes.func,
     setCurrentPage: PropTypes.func,
-    currentPage: PropTypes.number,
     listsPerPage: PropTypes.number,
-    setPaginatedLists: PropTypes.func,
     setShowAllTasks: PropTypes.func,
     orderByTitle: PropTypes.bool,
     setSearchIsActive: PropTypes.func,
     order: PropTypes.string,
-    setTotalLists: PropTypes.func,
     totalLists: PropTypes.number,
     refetchTotalLists: PropTypes.func,
     setCurrentTaskPage: PropTypes.func,

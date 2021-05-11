@@ -18,6 +18,7 @@ import {
     Options,
     Actions,
     ListInput,
+    NoList,
 } from './CenterColumn.styles';
 import { Warnning } from '../Login/LoginForm.style';
 import '../../fonts.css';
@@ -30,7 +31,7 @@ import remove from '../../imgs/remove.png';
 import deleteTask from '../../imgs/deleteTask.png';
 import { useEffect, useState } from 'react';
 import { PropTypes } from 'prop-types';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import {
     DELETE_LIST_MUTATION,
     NEW_TASK_MUTATION,
@@ -38,8 +39,6 @@ import {
     UPDATE_TASK_DESCRIPTION_MUTATION,
     DELETE_TASK_MUTATION,
     LIST_TOTAL_TASK_MUTATION,
-    LIST_INFO_MUTATION,
-    CLIENT_LISTS_MUTATION,
     ALL_CLIENT_TASKS_MUTATION,
     UPDATE_TASK_TITLE_MUTATION,
     SEARCHED_TASKS_MUTATION,
@@ -53,18 +52,13 @@ import Pagination from '../Pagination';
 import { GET_CLIENT, GET_CLIENT_TOTAL_TASKS, GET_LIST_TASKS } from '../../graphQL/Queries';
 
 const CenterColumn = ({
-    lists,
-    activeList,
     setChangeLayout,
     changeLayout,
-    setActiveList,
     rename,
     setRename,
     showOptions,
     setShowOptions,
-    setPaginatedLists,
     showAllTasks,
-    loggedIdClient,
     setOrderByTitle,
     orderByTitle,
     searchedTasks,
@@ -85,9 +79,8 @@ const CenterColumn = ({
     loadListInfo,
     listInfo,
     refetchTotalLists,
+    loadingListInfo,
 }) => {
-    const [listIsActive, setListIsActive] = useState(false);
-    const [activeTask, setActiveTask] = useState();
     const [renameTask, setRenameTask] = useState(false);
     const [isAsc, setIsAsc] = useState(true);
     const [getTotalTasks] = useMutation(LIST_TOTAL_TASK_MUTATION);
@@ -97,10 +90,6 @@ const CenterColumn = ({
                 query: GET_CLIENT,
                 variables: { limit: listsPerPage, offset: 0 },
             });
-            /* const deletedList = existingLists.getClientInformation.list.filter(
-                (l) => l.idList == listInfo.listQuery.idList,
-            );
-            console.log(deletedList); */
             cache.writeQuery({
                 query: GET_CLIENT,
                 data: {
@@ -295,6 +284,8 @@ const CenterColumn = ({
     const [newName] = useMutation(RENAME_LIST_MUTATION, {
         update: (cache, { data }) => {
             const newListFromResponse = data?.updateList;
+            console.log(listInfo.listQuery.idList);
+            console.log(listInfo.listQuery.idClient);
             cache.writeQuery({
                 query: GET_LIST_TASKS,
                 data: {
@@ -303,8 +294,8 @@ const CenterColumn = ({
                 variables: {
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
-                    limit: 13,
-                    offset: 0,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -318,14 +309,13 @@ const CenterColumn = ({
     //Pagination States
     const { data: totalClientAllTasks } = useQuery(GET_CLIENT_TOTAL_TASKS);
     const [getClientAllTasks] = useMutation(ALL_CLIENT_TASKS_MUTATION);
-    const [getClientLists] = useMutation(CLIENT_LISTS_MUTATION);
-    const [getListTasks, { loading }] = useMutation(LIST_INFO_MUTATION);
     //const [currentTaskPage, setCurrentTaskPage] = useState(1);
     const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
     const [tasksPerPage] = useState(13);
     const [totalTasks, setTotalTasks] = useState(1);
     const [listsPerPage] = useState(10);
     const [allTasksList, setAllTasksList] = useState();
+    const [activeTask, setActiveTask] = useState();
 
     function changeClientAllTasks() {
         const offset = tasksPerPage * (currentTotalTaskPage - 1);
@@ -333,7 +323,7 @@ const CenterColumn = ({
             variables: {
                 limit: tasksPerPage,
                 offset: offset,
-                idClient: loggedIdClient,
+                idClient: dataClient.idClient,
                 orderByTitle: orderByTitle,
                 order: order,
             },
@@ -341,7 +331,6 @@ const CenterColumn = ({
             if (data.data.getAllTasks) {
                 //console.log(data.data.getAllTasks)
                 setAllTasksList(data.data.getAllTasks);
-                //setActiveList(data.data)
             }
         });
     }
@@ -359,15 +348,15 @@ const CenterColumn = ({
     }, [showAllTasks]);
 
     const paginatedTasks = () => {
-        const { idList, idClient } = activeList;
+        //const { idList, idClient } = listInfo.listQuery;
         //console.log('page: ', currentTaskPage);
         const offset = tasksPerPage * (currentTaskPage - 1);
         //console.log(idList, idClient, tasksPerPage, offset, orderByTitle, order);
         //console.log(offset);
-        getListTasks({
+        /* getListTasks({
             variables: {
-                idList: idList,
-                idClient: idClient,
+                idList: listInfo.listQuery.idList,
+                idClient: listInfo.listQuery.idClient,
                 limit: tasksPerPage,
                 offset: offset,
                 orderByTitle: orderByTitle,
@@ -378,8 +367,7 @@ const CenterColumn = ({
             },
         }).then((data) => {
             //console.log(data);
-            //setActiveList(data.data.getList);
-            /* if (data.data.getList.taskss.tasks.length != 0) { */
+            //if (data.data.getList.taskss.tasks.length != 0) {
             setActiveList((prevActiveList) => {
                 return {
                     idList: prevActiveList.idList,
@@ -393,8 +381,8 @@ const CenterColumn = ({
             });
             //console.log(data.data);
             //console.log('hasMore: ', data.data.getList.taskss.hasMore);
-            /* } */
-        });
+            //}
+        }); */
     };
 
     //todo: uncomment this later
@@ -404,35 +392,9 @@ const CenterColumn = ({
     }, [currentTaskPage]); */
 
     function changePaginatedLists() {
-        //const offset = listsPerPage * (currentPage - 1);
-        getClientLists({ variables: { limit: listsPerPage, offset: 0 } }).then((data) => {
-            if (!data) {
-                console.log('something went wrong');
-            } else {
-                //console.log(data.data);
-                setPaginatedLists(data.data.getClientInformations.list);
-                getListTasks({
-                    variables: {
-                        idList: data.data.getClientInformations.list[0].idList,
-                        idClient: data.data.getClientInformations.list[0].idClient,
-                        limit: tasksPerPage,
-                        offset: 0,
-                        orderByTitle: orderByTitle,
-                        order: order,
-                    },
-                }).then((data) => {
-                    if (data.data) {
-                        setActiveList(data.data.getList);
-                        //console.log(data.data.getList);
-                    }
-                });
-            }
-        });
-        //new stuff
         refetchLists({ variables: { offset: listsPerPage * (currentPage - 1) } });
         getListInfo();
         refetchTotalLists();
-        //setCurrentPage(1);
     }
 
     /* useEffect(() => {
@@ -442,39 +404,31 @@ const CenterColumn = ({
     }, [currentTaskPage]);*/
 
     const getListInfo = () => {
-        loadListInfo({
-            variables: {
-                idList: dataClient.list[0].idList,
-                idClient: dataClient.list[0].idClient,
-                limit: tasksPerPage,
-                offset: 0,
-                orderByTitle: orderByTitle,
-                order: order,
-            },
-        });
+        if (dataClient.list[0])
+            loadListInfo({
+                variables: {
+                    idList: dataClient.list[0].idList,
+                    idClient: dataClient.list[0].idClient,
+                    limit: tasksPerPage,
+                    offset: 0,
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
     };
 
     useEffect(() => {
         getListInfo();
     }, [currentPage]);
-    //console.log(listInfo);
 
-    function changeTotalTasks() {
-        const { idList, idClient } = activeList;
-        const values = { idList: idList, idClient: idClient };
+    /* function changeTotalTasks() {
+        //const { idList, idClient } = listInfo.listQuery;
+        const values = { idList: listInfo.listQuery.idList, idClient: listInfo.listQuery.idClient };
         getTotalTasks({ variables: values }).then((data) => {
             //console.log(data.data);
             setTotalTasks(data.data);
         });
-    }
-
-    useEffect(() => {
-        if (activeList) {
-            setListIsActive(true);
-            changeTotalTasks();
-            //paginatedTasks();
-        }
-    }, [activeList]);
+    } */
 
     if (errorDelete) {
         return <div>{errorDelete}</div>;
@@ -488,92 +442,61 @@ const CenterColumn = ({
     };
 
     const removeList = () => {
-        const { idList, idClient } = activeList;
-        const list = { idList, idClient };
-
+        //const { idList, idClient } = listInfo.listQuery;
+        const list = { idList: listInfo.listQuery.idList, idClient: listInfo.listQuery.idClient };
         deleteList({
             variables: list,
         }).then((data) => {
-            if (!data.data) {
-                console.log('something went wrong');
-            } else {
+            if (data.data) {
                 doTotalLists();
-                changePaginatedLists();
+                changePaginatedLists(); //keep this
                 setShowOptions(false);
             }
         });
-        //console.log(lists);
     };
 
     const handleRename = (values) => {
         const newValue = {
-            idList: activeList.idList,
-            title: values.listName,
-            idClient: activeList.idClient,
+            idList: listInfo.listQuery.idList,
+            listName: values.listName,
+            idClient: listInfo.listQuery.idClient,
             limit: tasksPerPage,
-            offset: 0,
+            offset: tasksPerPage * (currentTaskPage - 1),
             orderByTitle: orderByTitle,
             order: order,
         };
-        newName({ variables: newValue })
-            .then((data) => {
-                if (data.data.updateList) {
-                    //setActiveList(data.data.updateList);
-                    changeListTasks();
-                } else {
-                    console.log('something went wrong');
-                }
-            })
-            .then(setRename(false));
+        newName({ variables: newValue }).then(setRename(false));
     };
 
     const handleNewTask = (values) => {
-        const { idList, idClient } = activeList;
-        const task = { title: values.title, idList, idClient };
-        /* console.log(task); */
-        newTask({ variables: task }).then((data) => {
-            if (!data.data) {
-                console.log('something went wrong');
-            } else {
-                //console.log(data.data);
-                changeListTasks();
-            }
-        });
-
+        //const { idList, idClient } = listInfo.listQuery;
+        const task = {
+            title: values.title,
+            idList: listInfo.listQuery.idList,
+            idClient: listInfo.listQuery.idClient,
+        };
+        newTask({ variables: task });
         values.title = '';
     };
 
     const handleNewDescription = (values) => {
         const { idTask } = activeTask;
         //const {idClient} = activeList
-        const task = { idTask: idTask, description: values.description, idClient: loggedIdClient };
+        const task = { idTask: idTask, description: values.description, idClient: dataClient.idClient };
         //console.log(task)
-        updateDescription({ variables: task }).then((data) => {
-            if (data.data.updateTaskDescription) {
-                setActiveTask(data.data.updateTaskDescription);
-                changeListTasks();
-                //console.log(data.data.updateTaskDescription);
-                //console.log(activeTask);
-            }
-        });
+        updateDescription({ variables: task });
     };
 
     const changeListTasks = () => {
-        const offset = tasksPerPage * (currentTaskPage - 1);
-        getListTasks({
+        loadListInfo({
             variables: {
-                idList: activeList.idList,
-                idClient: loggedIdClient,
+                idList: listInfo.listQuery.idList,
+                idClient: listInfo.listQuery.idClient,
                 limit: tasksPerPage,
-                offset: offset,
+                offset: tasksPerPage * (currentTaskPage - 1),
                 orderByTitle: orderByTitle,
                 order: order,
             },
-        }).then((data) => {
-            if (data.data) {
-                setActiveList(data.data.getList);
-                //console.log(data.data.getList);
-            }
         });
     };
 
@@ -588,7 +511,7 @@ const CenterColumn = ({
     }
 
     const handleUpdateTaskTitle = (values) => {
-        const newTask = { idTask: activeTask.idTask, title: values.title, idClient: loggedIdClient };
+        const newTask = { idTask: activeTask.idTask, title: values.title, idClient: dataClient.idClient };
         updateTaskTitle({ variables: newTask }).then((data) => {
             if (data.data) {
                 //console.log(data.data.updateTaskTitle);
@@ -605,18 +528,9 @@ const CenterColumn = ({
 
     const handleDeleteTask = () => {
         const { idTask } = activeTask;
-        const { idClient } = activeList;
-        const task = { idTask, idClient };
-        doDeleteTask({ variables: task }).then((data) => {
-            if (!data.data) {
-                console.log('something went wrong');
-            } else {
-                //console.log(data.data);
-                //setCurrentTaskPage(1);
-                changeListTasks();
-                setChangeLayout(false);
-            }
-        });
+        //const { idClient } = listInfo.listQuery.idClient;
+        const task = { idTask: idTask, idClient: listInfo.listQuery.idClient };
+        doDeleteTask({ variables: task }).then(setChangeLayout(false));
     };
 
     const searchTasks = () => {
@@ -625,7 +539,7 @@ const CenterColumn = ({
             variables: {
                 limit: tasksPerPage,
                 offset: offset,
-                idClient: loggedIdClient,
+                idClient: dataClient.idClient,
                 orderByTitle: orderByTitle,
                 search: search,
                 order: order,
@@ -648,9 +562,7 @@ const CenterColumn = ({
     };
 
     useEffect(() => {
-        if (activeList) {
-            getTasks();
-        }
+        if (listInfo) getTasks();
     }, [isAsc, orderByTitle]);
 
     const doSort = () => {
@@ -691,6 +603,14 @@ const CenterColumn = ({
         description: Yup.string().required('A Name is Required'),
     });
 
+    if (!listInfo) {
+        return (
+            <NoList>
+                <H2>You Still Haven&apos;t created any List, try doing so in the side bar</H2>
+            </NoList>
+        );
+    }
+
     return (
         <Wrapper>
             <CenterBar>
@@ -714,9 +634,9 @@ const CenterColumn = ({
                                 </H2>
                             </TasksToolbarTitleItem>
                         )}
-                        {activeList && rename && !showAllTasks && (
+                        {listInfo && rename && !showAllTasks && (
                             <Formik
-                                initialValues={{ listName: activeList.listName }}
+                                initialValues={{ listName: listInfo.listQuery.listName }}
                                 validationSchema={validateRename}
                                 onSubmit={handleRename}
                             >
@@ -749,21 +669,21 @@ const CenterColumn = ({
                             </TasksToolbarTitleItem>
                         )}
 
-                        {activeList && !showAllTasks && !searchIsActive && (
+                        {listInfo && !showAllTasks && !searchIsActive && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
                                 totalLists={totalTasks.getListsTotalTasks}
                                 setCurrentPage={setCurrentTaskPage}
                             />
                         )}
-                        {activeList && showAllTasks && !searchIsActive && (
+                        {listInfo && showAllTasks && !searchIsActive && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
                                 totalLists={totalClientAllTasks.getTotalAllTasks}
                                 setCurrentPage={setCurrentTotalTaskPage}
                             />
                         )}
-                        {activeList && !showAllTasks && searchIsActive && (
+                        {listInfo && !showAllTasks && searchIsActive && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
                                 totalLists={totalSearchedTasks}
@@ -774,10 +694,12 @@ const CenterColumn = ({
 
                     {changeLayout && (
                         <TaskToolbarRight changeLayout>
-                            <Img src={sort} alt="" onClick={doSort} />
-                            <Button onClick={doSort}>Sort</Button>
-                            <br />
-                            <br />
+                            {!orderByTitle && (
+                                <>
+                                    <Img src={sort} alt="" onClick={doSort} />
+                                    <Button onClick={doSort}>Sort</Button>
+                                </>
+                            )}
                             {orderByTitle && (
                                 <div>
                                     {isAsc && <Img src={asc} alt="" onClick={() => sortDesc()} />}
@@ -792,10 +714,12 @@ const CenterColumn = ({
                     {!changeLayout && (
                         <>
                             <TaskToolbarRight>
-                                <Img src={sort} alt="" onClick={doSort} />
-                                <Button onClick={doSort}>Sort</Button>
-                                <br />
-                                <br />
+                                {!orderByTitle && (
+                                    <>
+                                        <Img src={sort} alt="" onClick={doSort} />
+                                        <Button onClick={doSort}>Sort</Button>
+                                    </>
+                                )}
                                 {orderByTitle && (
                                     <div>
                                         {isAsc && <Img src={asc} alt="" onClick={() => sortDesc()} />}
@@ -832,39 +756,38 @@ const CenterColumn = ({
                     </BaseAdd>
                 )}
 
-                {/* console.log(listInfo.listQuery.taskss.tasks) */}
-                {listIsActive && listInfo && !showAllTasks && !searchIsActive && (
+                {listInfo && !showAllTasks && !searchIsActive && (
                     <Tasks
                         tasks={listInfo.listQuery.taskss.tasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
-                        loggedIdClient={loggedIdClient}
+                        loggedIdClient={dataClient.idClient}
                         setPage={setCurrentTaskPage}
-                        loading={loading}
-                        hasMore={activeList.taskss.hasMore}
+                        loading={loadingListInfo}
+                        hasMore={listInfo.listQuery.taskss.hasMore}
                         updateCompletion={updateCompletion}
                     />
                 )}
 
-                {/* listIsActive && showAllTasks && !searchIsActive && (
+                {/* listInfo && showAllTasks && !searchIsActive && (
                     <Tasks
                         tasks={allTasksList}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
-                        loggedIdClient={loggedIdClient}
+                        loggedIdClient={dataClient.idClient}
                         updateCompletion={updateCompletion}
                     />
                 )}
 
-                {listIsActive && !showAllTasks && searchIsActive && (
+                {listInfo && !showAllTasks && searchIsActive && (
                     <Tasks
                         tasks={searchedTasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
-                        loggedIdClient={loggedIdClient}
+                        loggedIdClient={dataClient.idClient}
                         updateCompletion={updateCompletion}
                     />
                 ) */}
@@ -915,7 +838,6 @@ const CenterColumn = ({
 };
 
 CenterColumn.propTypes = {
-    lists: PropTypes.array,
     activeList: PropTypes.object,
     setChangeLayout: PropTypes.func,
     changeLayout: PropTypes.bool,
@@ -924,9 +846,7 @@ CenterColumn.propTypes = {
     rename: PropTypes.bool,
     showOptions: PropTypes.bool,
     setShowOptions: PropTypes.func,
-    setPaginatedLists: PropTypes.func,
     showAllTasks: PropTypes.bool,
-    loggedIdClient: PropTypes.number,
     setOrderByTitle: PropTypes.func,
     orderByTitle: PropTypes.bool,
     searchedTasks: PropTypes.array,
@@ -947,6 +867,7 @@ CenterColumn.propTypes = {
     loadListInfo: PropTypes.func,
     listInfo: PropTypes.object,
     refetchTotalLists: PropTypes.func,
+    loadingListInfo: PropTypes.bool,
 };
 
 export default CenterColumn;
