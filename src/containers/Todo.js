@@ -117,6 +117,7 @@ const Todo = () => {
                         setCurrentTaskPage={setCurrentTaskPage}
                         dataClient={dataClient.getClientInformation}
                         loadListInfo={loadListInfo}
+                        currentPage={currentPage}
                     />
 
                     {dataClient && (
@@ -148,6 +149,7 @@ const Todo = () => {
                             listInfo={listInfo}
                             loadingListInfo={loadingListInfo}
                             fetchMoreListInfo={fetchMoreListInfo}
+                            setCurrentPage={setCurrentPage}
                         />
                     )}
                 </Wrapper>

@@ -25,13 +25,14 @@ const SideBar = ({
     setCurrentTaskPage,
     dataClient,
     loadListInfo,
+    currentPage,
 }) => {
     const [makeNewList, { error: errorNewList }] = useMutation(NEW_LIST_MUTATION, {
         update: (cache, { data }) => {
             const newListFromResponse = data?.addList;
             const existingLists = cache.readQuery({
                 query: GET_CLIENT,
-                variables: { limit: listsPerPage, offset: 0 },
+                variables: { limit: listsPerPage, offset: listsPerPage * (currentPage - 1) },
             });
             //console.log(existingLists);
 
@@ -144,6 +145,7 @@ SideBar.propTypes = {
     setCurrentTaskPage: PropTypes.func,
     dataClient: PropTypes.object,
     loadListInfo: PropTypes.func,
+    currentPage: PropTypes.number,
 };
 
 export default SideBar;

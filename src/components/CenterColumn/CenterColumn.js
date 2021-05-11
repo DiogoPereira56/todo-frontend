@@ -81,6 +81,7 @@ const CenterColumn = ({
     listInfo,
     loadingListInfo,
     fetchMoreListInfo,
+    setCurrentPage,
 }) => {
     const [renameTask, setRenameTask] = useState(false);
     const [isAsc, setIsAsc] = useState(true);
@@ -88,14 +89,14 @@ const CenterColumn = ({
         update(cache, { data }) {
             const existingLists = cache.readQuery({
                 query: GET_CLIENT,
-                variables: { limit: listsPerPage, offset: 0 },
+                variables: { limit: listsPerPage, offset: listsPerPage * (currentPage - 1) },
             });
             cache.writeQuery({
                 query: GET_CLIENT,
                 data: {
                     getClientInformation: [...existingLists?.getClientInformation.list],
                 },
-                variables: { limit: listsPerPage, offset: 0 },
+                variables: { limit: listsPerPage, offset: listsPerPage * (currentPage - 1) },
             });
             let numLists = cache.readQuery({
                 query: CLIENT_TOTAL_LISTS,
@@ -116,7 +117,7 @@ const CenterColumn = ({
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -134,7 +135,7 @@ const CenterColumn = ({
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -151,7 +152,7 @@ const CenterColumn = ({
                     idList: newTask.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -172,7 +173,7 @@ const CenterColumn = ({
                     idList: newTask.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -188,7 +189,7 @@ const CenterColumn = ({
                     idList: newTask.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -209,7 +210,7 @@ const CenterColumn = ({
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -225,7 +226,7 @@ const CenterColumn = ({
                     idList: newTask.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -246,7 +247,7 @@ const CenterColumn = ({
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -262,7 +263,7 @@ const CenterColumn = ({
                     idList: newTask.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -283,7 +284,7 @@ const CenterColumn = ({
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -304,7 +305,7 @@ const CenterColumn = ({
                     idList: listInfo.listQuery.idList,
                     idClient: listInfo.listQuery.idClient,
                     limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    offset: tasksPerPage * (currentTaskPage - 1),
                     orderByTitle: orderByTitle,
                     order: order,
                 },
@@ -387,22 +388,9 @@ const CenterColumn = ({
 
     useEffect(() => {
         if (!loadingListInfo && listInfo) paginatedTasks();
-        //console.log(currentTaskPage);
     }, [currentTaskPage]);
-    //console.log(listInfo);
 
-    function changePaginatedLists() {
-        refetchLists({ variables: { limit: listsPerPage, offset: 0 } });
-        getListInfo();
-    }
-
-    /* useEffect(() => {
-        if (activeList) {
-            changeListTasks();
-        }
-    }, [currentTaskPage]);*/
-
-    const getListInfo = () => {
+    const doListInfo = () => {
         if (dataClient.list[0])
             loadListInfo({
                 variables: {
@@ -414,6 +402,35 @@ const CenterColumn = ({
                     order: order,
                 },
             });
+    };
+
+    function changePaginatedLists() {
+        setTimeout(() => {
+            refetchLists({ variables: { limit: listsPerPage, offset: 0 } });
+            doListInfo();
+        }, 70);
+    }
+
+    /* useEffect(() => {
+        if (activeList) {
+            changeListTasks();
+        }
+    }, [currentTaskPage]);*/
+
+    const getListInfo = () => {
+        setTimeout(() => {
+            if (dataClient.list[0])
+                loadListInfo({
+                    variables: {
+                        idList: dataClient.list[0].idList,
+                        idClient: dataClient.list[0].idClient,
+                        limit: tasksPerPage,
+                        offset: 0,
+                        orderByTitle: orderByTitle,
+                        order: order,
+                    },
+                });
+        }, 50);
     };
 
     useEffect(() => {
@@ -439,7 +456,8 @@ const CenterColumn = ({
         deleteList({
             variables: list,
         }).then(() => {
-            changePaginatedLists(); //keep this
+            //setCurrentPage(1);
+            changePaginatedLists();
             setShowOptions(false);
         });
     };
@@ -763,8 +781,8 @@ const CenterColumn = ({
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
-                        //setPage={}
-                        //loading={}
+                        //setPage={setCurrentTotalTaskPage}
+                        //loading={loadingAllTasks}
                         //hasMore={}
                         updateCompletion={updateCompletion}
                     />
@@ -859,6 +877,7 @@ CenterColumn.propTypes = {
     listInfo: PropTypes.object,
     loadingListInfo: PropTypes.bool,
     fetchMoreListInfo: PropTypes.func,
+    setCurrentPage: PropTypes.func,
 };
 
 export default CenterColumn;
