@@ -110,7 +110,7 @@ const Input = styled.input`
 const Task = styled.div`
     margin: 0 24px;
     box-shadow: inset 0 1px 0 0 #e5e5e5;
-    padding: 13px;
+    padding: 13.7px;
     cursor: pointer;
 
     &:hover {

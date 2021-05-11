@@ -315,10 +315,13 @@ const CenterColumn = ({
     //Queries
     //Pagination States
     const { data: totalClientAllTasks } = useQuery(GET_CLIENT_TOTAL_TASKS);
-    const [loadAllTasks, { loading: loadingAllTasks, data: allTasksList }] = useLazyQuery(ALL_CLIENT_TASKS);
+    const [
+        loadAllTasks,
+        { loading: loadingAllTasks, data: allTasksList, fetchMore: fetchMoreAllTasks },
+    ] = useLazyQuery(ALL_CLIENT_TASKS);
 
     const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
-    const [tasksPerPage] = useState(13);
+    const [tasksPerPage] = useState(14);
     const [totalTasks, setTotalTasks] = useState(1);
     const [listsPerPage] = useState(10);
     const [activeTask, setActiveTask] = useState();
@@ -336,11 +339,40 @@ const CenterColumn = ({
         });
     }
 
+    function paginatedClientAllTasks() {
+        const offset = tasksPerPage * (currentTotalTaskPage - 1);
+        fetchMoreAllTasks({
+            variables: {
+                limit: tasksPerPage,
+                offset: offset,
+                idClient: dataClient.idClient,
+                orderByTitle: orderByTitle,
+                order: order,
+            },
+            updateQuery: (pt, { fetchMoreResult }) => {
+                //console.log(fetchMoreResult);
+                if (!fetchMoreResult) return pt;
+                return {
+                    getAllTasks: {
+                        tasks: [...pt.getAllTasks.tasks, ...fetchMoreResult.getAllTasks.tasks],
+                        hasMore: fetchMoreResult.getAllTasks.hasMore,
+                    },
+                };
+            },
+        });
+    }
+
+    useEffect(() => {
+        if (showAllTasks) {
+            paginatedClientAllTasks();
+        }
+    }, [currentTotalTaskPage]);
+
     useEffect(() => {
         if (showAllTasks) {
             changeClientAllTasks();
         }
-    }, [showAllTasks, currentTotalTaskPage]);
+    }, [showAllTasks]);
 
     useEffect(() => {
         if (showAllTasks) {
@@ -362,17 +394,17 @@ const CenterColumn = ({
                     orderByTitle: orderByTitle,
                     order: order,
                 },
-                updateQuery: (pl, { fetchMoreResult }) => {
+                updateQuery: (pt, { fetchMoreResult }) => {
                     //console.log(fetchMoreResult);
-                    if (!fetchMoreResult) return pl;
+                    if (!fetchMoreResult) return pt;
                     return {
                         listQuery: {
-                            idList: pl.listQuery.idList,
-                            idClient: pl.listQuery.idClient,
-                            listName: pl.listQuery.listName,
+                            idList: pt.listQuery.idList,
+                            idClient: pt.listQuery.idClient,
+                            listName: pt.listQuery.listName,
                             taskss: {
                                 tasks: [
-                                    ...pl.listQuery.taskss.tasks,
+                                    ...pt.listQuery.taskss.tasks,
                                     ...fetchMoreResult.listQuery.taskss.tasks,
                                 ],
                                 hasMore: fetchMoreResult.listQuery.taskss.hasMore,
@@ -776,14 +808,14 @@ const CenterColumn = ({
 
                 {allTasksList && showAllTasks && !searchIsActive && (
                     <Tasks
-                        tasks={allTasksList.getAllTasks}
+                        tasks={allTasksList.getAllTasks.tasks}
                         setChangeLayout={setChangeLayout}
                         changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
-                        //setPage={setCurrentTotalTaskPage}
-                        //loading={loadingAllTasks}
-                        //hasMore={}
+                        setPage={setCurrentTotalTaskPage}
+                        loading={loadingAllTasks}
+                        hasMore={allTasksList.getAllTasks.hasMore}
                         updateCompletion={updateCompletion}
                     />
                 )}

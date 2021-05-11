@@ -98,11 +98,14 @@ export const ALL_CLIENT_TASKS = gql`
             orderByTitle: $orderByTitle
             order: $order
         ) {
-            idTask
-            idList
-            title
-            complete
-            description
+            tasks {
+                idTask
+                idList
+                title
+                complete
+                description
+            }
+            hasMore
         }
     }
 `;
