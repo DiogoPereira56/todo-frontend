@@ -80,6 +80,7 @@ const CenterColumn = ({
     loadListInfo,
     listInfo,
     loadingListInfo,
+    fetchMoreListInfo,
 }) => {
     const [renameTask, setRenameTask] = useState(false);
     const [isAsc, setIsAsc] = useState(true);
@@ -347,48 +348,49 @@ const CenterColumn = ({
     }, [showAllTasks]);
 
     const paginatedTasks = () => {
-        //const { idList, idClient } = listInfo.listQuery;
-        //console.log('page: ', currentTaskPage);
+        const { idList, idClient } = listInfo.listQuery;
         const offset = tasksPerPage * (currentTaskPage - 1);
         //console.log(idList, idClient, tasksPerPage, offset, orderByTitle, order);
-        //console.log(offset);
-        /* getListTasks({
-            variables: {
-                idList: listInfo.listQuery.idList,
-                idClient: listInfo.listQuery.idClient,
-                limit: tasksPerPage,
-                offset: offset,
-                orderByTitle: orderByTitle,
-                order: order,
-            },
-            update(cache, { data: { getListTasks } }) {
-                //console.log(cache);
-            },
-        }).then((data) => {
-            //console.log(data);
-            //if (data.data.getList.taskss.tasks.length != 0) {
-            setActiveList((prevActiveList) => {
-                return {
-                    idList: prevActiveList.idList,
-                    idClient: prevActiveList.idClient,
-                    listName: prevActiveList.listName,
-                    taskss: {
-                        tasks: [...prevActiveList.taskss.tasks, ...data.data.getList.taskss.tasks],
-                        hasMore: data.data.getList.taskss.hasMore,
-                    },
-                };
+        try {
+            fetchMoreListInfo({
+                query: GET_LIST_TASKS,
+                variables: {
+                    idList: idList,
+                    idClient: idClient,
+                    limit: tasksPerPage,
+                    offset: offset,
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+                updateQuery: (pl, { fetchMoreResult }) => {
+                    //console.log(fetchMoreResult);
+                    if (!fetchMoreResult) return pl;
+                    return {
+                        listQuery: {
+                            idList: pl.listQuery.idList,
+                            idClient: pl.listQuery.idClient,
+                            listName: pl.listQuery.listName,
+                            taskss: {
+                                tasks: [
+                                    ...pl.listQuery.taskss.tasks,
+                                    ...fetchMoreResult.listQuery.taskss.tasks,
+                                ],
+                                hasMore: fetchMoreResult.listQuery.taskss.hasMore,
+                            },
+                        },
+                    };
+                },
             });
-            //console.log(data.data);
-            //console.log('hasMore: ', data.data.getList.taskss.hasMore);
-            //}
-        }); */
+        } catch (err) {
+            //Continue
+        }
     };
 
     //todo: uncomment this later
-    /* useEffect(() => {
-        if (!loading) paginatedTasks();
+    useEffect(() => {
+        if (!loadingListInfo && listInfo) paginatedTasks();
         //console.log(currentTaskPage);
-    }, [currentTaskPage]); */
+    }, [currentTaskPage]);
 
     function changePaginatedLists() {
         refetchLists({ variables: { limit: listsPerPage, offset: 0 } });
@@ -857,6 +859,7 @@ CenterColumn.propTypes = {
     loadListInfo: PropTypes.func,
     listInfo: PropTypes.object,
     loadingListInfo: PropTypes.bool,
+    fetchMoreListInfo: PropTypes.func,
 };
 
 export default CenterColumn;

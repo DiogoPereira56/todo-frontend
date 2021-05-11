@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from 'react';
 
 const Todo = () => {
-    //Mutations
+    //queries
     const [loadSearchedTasks, { loading: loadingSearchedTasks, data: searchedTasks }] = useLazyQuery(
         SEARCHED_TASKS,
     );
@@ -44,10 +44,11 @@ const Todo = () => {
             variables: { limit: listsPerPage, offset: listsPerPage * (currentPage - 1) },
         },
     );
-    const [loadListInfo, { error: errorListInfo, loading: loadingListInfo, data: listInfo }] = useLazyQuery(
-        GET_LIST_TASKS,
-    );
-    const { error: errorTL, loading: loadingTL, data: dataTotalLists } = useQuery(CLIENT_TOTAL_LISTS);
+    const [
+        loadListInfo,
+        { loading: loadingListInfo, data: listInfo, fetchMore: fetchMoreListInfo },
+    ] = useLazyQuery(GET_LIST_TASKS);
+    const { data: dataTotalLists } = useQuery(CLIENT_TOTAL_LISTS);
 
     const doTotalSearchedTasks = (values) => {
         loadTotalSearchedTasks({
@@ -148,6 +149,7 @@ const Todo = () => {
                             loadListInfo={loadListInfo}
                             listInfo={listInfo}
                             loadingListInfo={loadingListInfo}
+                            fetchMoreListInfo={fetchMoreListInfo}
                         />
                     )}
                 </Wrapper>
