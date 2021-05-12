@@ -53,12 +53,11 @@ const TopNavbar = ({ name, handleSearchedTasks }) => {
                             <Img src={whatsNew} alt="" />
                         </Li>
                         <Li>
-                            {' '}
-                            <p>{name}</p>{' '}
+                            <p>{name}</p>
                         </Li>
+                        <Li>|</Li>
                         <Li>
                             <p>
-                                |{' '}
                                 <A onClick={logOut} href="/">
                                     Log Out
                                 </A>

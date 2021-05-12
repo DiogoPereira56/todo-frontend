@@ -469,12 +469,6 @@ const CenterColumn = ({
         }, 70);
     }
 
-    /* useEffect(() => {
-        if (activeList) {
-            changeListTasks();
-        }
-    }, [currentTaskPage]);*/
-
     const getListInfo = () => {
         setTimeout(() => {
             if (dataClient.list[0])
@@ -494,15 +488,6 @@ const CenterColumn = ({
     useEffect(() => {
         getListInfo();
     }, [currentPage]);
-
-    /* function changeTotalTasks() {
-        //const { idList, idClient } = listInfo.listQuery;
-        const values = { idList: listInfo.listQuery.idList, idClient: listInfo.listQuery.idClient };
-        getTotalTasks({ variables: values }).then((data) => {
-            //console.log(data.data);
-            setTotalTasks(data.data);
-        });
-    } */
 
     if (errorDelete) {
         return <div>{errorDelete}</div>;
