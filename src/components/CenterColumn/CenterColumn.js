@@ -111,17 +111,19 @@ const CenterColumn = ({
     });
     const [doDeleteTask] = useMutation(DELETE_TASK_MUTATION, {
         update(cache, { data }) {
-            const existingTasks = cache.readQuery({
+            const values = {
+                idList: listInfo.listQuery.idList,
+                idClient: listInfo.listQuery.idClient,
+                limit: tasksPerPage,
+                offset: tasksPerPage * (currentTaskPage - 1),
+                orderByTitle: orderByTitle,
+                order: order,
+            };
+            const existingTasks = listInfo;
+            /* const existingTasks = cache.readQuery({
                 query: GET_LIST_TASKS,
-                variables: {
-                    idList: listInfo.listQuery.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
-            });
+                variables: values,
+            }); */
             cache.writeQuery({
                 query: GET_LIST_TASKS,
                 data: {
@@ -131,35 +133,26 @@ const CenterColumn = ({
                         },
                     },
                 },
-                variables: {
-                    idList: listInfo.listQuery.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
+                variables: values,
             });
         },
     });
     const [newTask] = useMutation(NEW_TASK_MUTATION, {
         update: (cache, { data }) => {
             const newTask = data?.addTask;
-
-            const existingTasks = cache.readQuery({
+            const values = {
+                idList: newTask.idList,
+                idClient: listInfo.listQuery.idClient,
+                limit: tasksPerPage,
+                offset: tasksPerPage * (currentTaskPage - 1),
+                orderByTitle: orderByTitle,
+                order: order,
+            };
+            const existingTasks = listInfo;
+            /* const existingTasks = cache.readQuery({
                 query: GET_LIST_TASKS,
-                variables: {
-                    idList: newTask.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
-            });
-            /* console.log(newTask);
-            console.log(existingTasks);
-            console.log(listInfo); */
+                variables: values,
+            }); */
             cache.writeQuery({
                 query: GET_LIST_TASKS,
                 data: {
@@ -169,32 +162,26 @@ const CenterColumn = ({
                         },
                     },
                 },
-                variables: {
-                    idList: newTask.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
+                variables: values,
             });
         },
     });
     const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION, {
         update: (cache, { data }) => {
             const newTask = data?.updateTaskDescription;
-            const oldList = cache.readQuery({
+            const values = {
+                idList: newTask.idList,
+                idClient: listInfo.listQuery.idClient,
+                limit: tasksPerPage,
+                offset: tasksPerPage * (currentTaskPage - 1),
+                orderByTitle: orderByTitle,
+                order: order,
+            };
+            const oldList = listInfo;
+            /* const oldList = cache.readQuery({
                 query: GET_LIST_TASKS,
-                variables: {
-                    idList: newTask.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
-            });
-
+                variables: values,
+            }); */
             let newList = [];
             oldList.listQuery.taskss.tasks.forEach((t) => {
                 if (t.idTask != newTask.idTask) newList.push(t);
@@ -206,32 +193,26 @@ const CenterColumn = ({
                 data: {
                     listQuery: { taskss: { tasks: [...newList] } },
                 },
-                variables: {
-                    idList: listInfo.listQuery.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
+                variables: values,
             });
         },
     });
     const [updateTaskTitle] = useMutation(UPDATE_TASK_TITLE_MUTATION, {
         update: (cache, { data }) => {
             const newTask = data?.updateTaskTitle;
-            const oldList = cache.readQuery({
+            const values = {
+                idList: newTask.idList,
+                idClient: listInfo.listQuery.idClient,
+                limit: tasksPerPage,
+                offset: tasksPerPage * (currentTaskPage - 1),
+                orderByTitle: orderByTitle,
+                order: order,
+            };
+            const oldList = listInfo;
+            /* const oldList = cache.readQuery({
                 query: GET_LIST_TASKS,
-                variables: {
-                    idList: newTask.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
-            });
-
+                variables: values,
+            }); */
             let newList = [];
             oldList.listQuery.taskss.tasks.forEach((t) => {
                 if (t.idTask != newTask.idTask) newList.push(t);
@@ -243,31 +224,28 @@ const CenterColumn = ({
                 data: {
                     listQuery: { taskss: { tasks: [...newList] } },
                 },
-                variables: {
-                    idList: listInfo.listQuery.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
+                variables: values,
             });
         },
     });
     const [updateCompletion] = useMutation(UPDATE_TASK_COMPLETION_MUTATION, {
         update: (cache, { data }) => {
             const newTask = data?.updateTaskCompletion;
-            const oldList = cache.readQuery({
-                query: GET_LIST_TASKS,
-                variables: {
-                    idList: newTask.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
-            });
+            const values = {
+                idList: newTask.idList,
+                idClient: listInfo.listQuery.idClient,
+                limit: tasksPerPage,
+                offset: tasksPerPage * (currentTaskPage - 1),
+                orderByTitle: orderByTitle,
+                order: order,
+            };
+
+            const oldList = listInfo;
+            /* const oldList = cache.readQuery({
+                    query: GET_LIST_TASKS,
+                    variables: values,
+                }); */
+            console.log(oldList);
 
             let newList = [];
             oldList.listQuery.taskss.tasks.forEach((t) => {
@@ -280,14 +258,7 @@ const CenterColumn = ({
                 data: {
                     listQuery: { taskss: { tasks: [...newList] } },
                 },
-                variables: {
-                    idList: listInfo.listQuery.idList,
-                    idClient: listInfo.listQuery.idClient,
-                    limit: tasksPerPage,
-                    offset: tasksPerPage * (currentTaskPage - 1),
-                    orderByTitle: orderByTitle,
-                    order: order,
-                },
+                variables: values,
             });
         },
     });
