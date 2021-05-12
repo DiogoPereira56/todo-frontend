@@ -13,7 +13,8 @@ const Wrapper = styled.div`
     flex: 1 1 0px;
     margin-top: 52px;
     position: relative;
-    z-index: 99;
+    z-index: 500;
+    min-height: calc(100vh - 52px);
 `;
 //Description Bar
 const DescriptionContainer = styled.div`
@@ -103,14 +104,14 @@ const Input = styled.input`
     border: none;
     font-size: 1rem;
     width: 100%;
-    height: 77px;
+    height: 60px;
 `;
 
 //Tasks
 const Task = styled.div`
     margin: 0 24px;
     box-shadow: inset 0 1px 0 0 #e5e5e5;
-    padding: 13.7px;
+    padding: 13.8px;
     cursor: pointer;
 
     &:hover {
@@ -123,6 +124,9 @@ const CheckBox = styled.input`
 
 const Content = styled.div`
     display: grid;
+    //position: static;
+    //z-index: 99;
+    //background-color: green;
     //grid-template-columns: 1fr 1fr;
     //overflow-y: scroll;
 `;
@@ -132,15 +136,20 @@ const Options = styled.div`
     width: 150px;
     background-color: white;
     position: absolute;
+    z-index: 400;
     border: 2px solid #eee;
+    //display: flex;
+    //display: grid;
 `;
 
 const Actions = styled.div`
     padding: 10px;
-    border-bottom: 1px solid #bdb8d7;
+    //padding: 9px;
+    //border-bottom: 1px solid #bdb8d7;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
+    //grid-row: 1;
 
     &:hover {
         background: rgb(248, 248, 248);

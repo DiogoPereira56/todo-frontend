@@ -294,12 +294,15 @@ const CenterColumn = ({
     const [newName] = useMutation(RENAME_LIST_MUTATION, {
         update: (cache, { data }) => {
             const newListFromResponse = data?.updateList;
-            console.log(listInfo.listQuery.idList);
+            /* console.log(listInfo.listQuery.idList);
             console.log(listInfo.listQuery.idClient);
+            console.log(newListFromResponse); */
             cache.writeQuery({
                 query: GET_LIST_TASKS,
                 data: {
-                    listQuery: [newListFromResponse],
+                    listQuery: {
+                        listName: [newListFromResponse.listName],
+                    },
                 },
                 variables: {
                     idList: listInfo.listQuery.idList,
@@ -309,6 +312,26 @@ const CenterColumn = ({
                     orderByTitle: orderByTitle,
                     order: order,
                 },
+            });
+            const oldLists = dataClient.list;
+            const listToBeAdded = {
+                __typename: 'ListOfTasks',
+                idList: newListFromResponse.idList,
+                listName: newListFromResponse.listName,
+                idClient: newListFromResponse.idClient,
+            };
+            let newLists = [];
+            oldLists.forEach((l) => {
+                if (l.idList != listToBeAdded.idList) newLists.push(l);
+                else newLists.push(listToBeAdded);
+            });
+            //console.log(newLists);
+            cache.writeQuery({
+                query: GET_CLIENT,
+                data: {
+                    getClientInformation: { list: [...newLists] },
+                },
+                variables: { limit: listsPerPage, offset: 0 },
             });
         },
     });
@@ -322,7 +345,6 @@ const CenterColumn = ({
 
     const [currentTotalTaskPage, setCurrentTotalTaskPage] = useState(1);
     const [tasksPerPage] = useState(14);
-    const [totalTasks, setTotalTasks] = useState(1);
     const [listsPerPage] = useState(10);
     const [activeTask, setActiveTask] = useState();
 
@@ -341,25 +363,29 @@ const CenterColumn = ({
 
     function paginatedClientAllTasks() {
         const offset = tasksPerPage * (currentTotalTaskPage - 1);
-        fetchMoreAllTasks({
-            variables: {
-                limit: tasksPerPage,
-                offset: offset,
-                idClient: dataClient.idClient,
-                orderByTitle: orderByTitle,
-                order: order,
-            },
-            updateQuery: (pt, { fetchMoreResult }) => {
-                //console.log(fetchMoreResult);
-                if (!fetchMoreResult) return pt;
-                return {
-                    getAllTasks: {
-                        tasks: [...pt.getAllTasks.tasks, ...fetchMoreResult.getAllTasks.tasks],
-                        hasMore: fetchMoreResult.getAllTasks.hasMore,
-                    },
-                };
-            },
-        });
+        try {
+            fetchMoreAllTasks({
+                variables: {
+                    limit: tasksPerPage,
+                    offset: offset,
+                    idClient: dataClient.idClient,
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+                updateQuery: (pt, { fetchMoreResult }) => {
+                    //console.log(fetchMoreResult);
+                    if (!fetchMoreResult) return pt;
+                    return {
+                        getAllTasks: {
+                            tasks: [...pt.getAllTasks.tasks, ...fetchMoreResult.getAllTasks.tasks],
+                            hasMore: fetchMoreResult.getAllTasks.hasMore,
+                        },
+                    };
+                },
+            });
+        } catch (err) {
+            //Continue
+        }
     }
 
     useEffect(() => {
@@ -504,7 +530,19 @@ const CenterColumn = ({
             orderByTitle: orderByTitle,
             order: order,
         };
-        newName({ variables: newValue }).then(setRename(false));
+        newName({ variables: newValue }).then(() => {
+            /* loadListInfo({
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            }); */
+            setRename(false);
+        });
     };
 
     const handleNewTask = (values) => {
@@ -705,20 +743,13 @@ const CenterColumn = ({
                             </TasksToolbarTitleItem>
                         )}
 
-                        {listInfo && !showAllTasks && !searchIsActive && (
-                            <Pagination
-                                listsPerPage={tasksPerPage}
-                                totalLists={totalTasks.getListsTotalTasks}
-                                setCurrentPage={setCurrentTaskPage}
-                            />
-                        )}
-                        {listInfo && showAllTasks && !searchIsActive && (
+                        {/* listInfo && showAllTasks && !searchIsActive && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
                                 totalLists={totalClientAllTasks.getTotalAllTasks}
                                 setCurrentPage={setCurrentTotalTaskPage}
                             />
-                        )}
+                        ) */}
                         {listInfo && !showAllTasks && searchIsActive && totalSearchedTasks && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
@@ -792,7 +823,7 @@ const CenterColumn = ({
                     </BaseAdd>
                 )}
 
-                {listInfo && !showAllTasks && !searchIsActive && (
+                {listInfo.listQuery.taskss && !showAllTasks && !searchIsActive && (
                     <Tasks
                         tasks={listInfo.listQuery.taskss.tasks}
                         setChangeLayout={setChangeLayout}
