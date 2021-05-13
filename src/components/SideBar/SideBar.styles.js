@@ -60,7 +60,7 @@ const PaginationWrapper = styled.div`
     margin: 7px;
 `;
 
-const Paginnation = styled.div`
+const PaginnationNumber = styled.div`
     margin-left: 3px;
     margin-right: 3px;
     width: 20px;
@@ -80,4 +80,16 @@ const PaginationPosition = styled.div`
     //border-bottom: 1px solid #bdb8d7;
 `;
 
-export { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationWrapper, Paginnation, PaginationPosition };
+export {
+    Wrapper,
+    SideBar2,
+    H2,
+    Img,
+    Li,
+    P,
+    Input,
+    Ul,
+    PaginationWrapper,
+    PaginnationNumber,
+    PaginationPosition,
+};

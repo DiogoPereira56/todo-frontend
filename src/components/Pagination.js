@@ -1,6 +1,6 @@
 import { PropTypes } from 'prop-types';
 import { useEffect, useState } from 'react';
-import { PaginationWrapper, Paginnation } from './SideBar/SideBar.styles';
+import { PaginationWrapper, PaginnationNumber } from './SideBar/SideBar.styles';
 
 const Pagination = ({ listsPerPage, totalLists, setCurrentPage }) => {
     const [pageNumbers, setPageNumbers] = useState([1]);
@@ -17,9 +17,9 @@ const Pagination = ({ listsPerPage, totalLists, setCurrentPage }) => {
         <nav>
             <PaginationWrapper>
                 {pageNumbers.map((number) => (
-                    <Paginnation key={number} onClick={() => setCurrentPage(number)}>
+                    <PaginnationNumber key={number} onClick={() => setCurrentPage(number)}>
                         {number}
-                    </Paginnation>
+                    </PaginnationNumber>
                 ))}
             </PaginationWrapper>
         </nav>

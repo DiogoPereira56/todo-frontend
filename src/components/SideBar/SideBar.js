@@ -1,5 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { Wrapper, SideBar2, H2, Img, Li, P, Input, Ul, PaginationPosition } from './SideBar.styles';
+import {
+    Wrapper,
+    SideBar2,
+    H2,
+    Img,
+    Li,
+    P,
+    Input,
+    Ul,
+    PaginationPosition,
+    PaginationWrapper,
+    PaginnationNumber,
+} from './SideBar.styles';
 import '../../fonts.css';
 import menu from '../../imgs/menu.png';
 import { useMutation } from '@apollo/client';
@@ -115,7 +127,12 @@ const SideBar = ({
                     )}
                 </Formik>
 
-                {totalLists && (
+                {!totalLists && (
+                    <PaginationWrapper>
+                        <PaginnationNumber>1</PaginnationNumber>
+                    </PaginationWrapper>
+                )}
+                {!!Math.ceil(totalLists / listsPerPage) && (
                     <PaginationPosition>
                         <Pagination
                             listsPerPage={listsPerPage}
