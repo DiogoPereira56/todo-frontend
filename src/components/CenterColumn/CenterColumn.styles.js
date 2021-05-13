@@ -77,7 +77,7 @@ const TaskToolbarRight = styled.div`
     min-width: ${(props) => (props.changeLayout ? 'calc(100vw - 1388px)' : 'calc(100vw - 1050px)')};
     &.hideSideBar {
         min-width: ${(props) => (props.changeLayout ? 'calc(100vw - 1170px)' : 'calc(100vw - 832px)')};
-    } //calc(100vw - 850px)
+    }
 `;
 const ChangeTask = styled(TaskToolbarRight)`
     margin-left: 600px;

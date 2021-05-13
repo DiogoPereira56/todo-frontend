@@ -42,6 +42,11 @@ const P = styled.p`
     color: black;
     display: block;
     font-size: 0.8rem;
+
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 `;
 const Input = styled.input`
     border: none !important;

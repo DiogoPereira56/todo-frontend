@@ -40,11 +40,7 @@ const ListOfTasks = ({
         <div>
             {lists.map((list) => (
                 <Li key={list.idList} onClick={() => makeActiveList(list)}>
-                    <P>
-                        {list.listName.length < 40
-                            ? `${list.listName}`
-                            : `${list.listName.substring(0, 37)}...`}
-                    </P>
+                    <P>{list.listName}</P>
                 </Li>
             ))}
         </div>
