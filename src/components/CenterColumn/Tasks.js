@@ -19,73 +19,26 @@ const Tasks = ({
         setChangeLayout(!changeLayout);
     };
 
-    const newTasks = [
-        {
-            idTask: 200,
-            title: 'nova task',
-            complete: false,
-            description: 'falta',
-            __typename: 'task',
-        },
-        {
-            idTask: 201,
-            title: 'nova nova task',
-            complete: false,
-            description: 'falta2',
-            __typename: 'task',
-        },
-    ];
-
-    const handleCompletedTask = (task) => {
+    const handleCompletedTask = (e, task) => {
+        e.stopPropagation();
         const values = { idTask: task.idTask, complete: !task.complete, idClient: loggedIdClient };
         updateCompletion({ variables: values });
     };
 
-    /* let lastKnownScrollPosition = 0;
-    //let ticking = false;
-    let limit = 300;
-    function getMoreTasks(scrollPos) {
-        if (scrollPos > limit) {
-            limit += 3000;
-            setTasks((prevTasks) => {
-                return [...prevTasks, ...newTasks];
-            });
-            console.log('Ask for more tasks: ' + limit);
-        }
-        return;
-    }
-
-    document.addEventListener('scroll', function () {
-        setTimeout(() => {
-            lastKnownScrollPosition = window.scrollY;
-
-            window.requestAnimationFrame(function () {
-                getMoreTasks(lastKnownScrollPosition);
-            });
-        }, 1000);
-    }); */
-
     const observer = useRef();
     const lastTaskRef = useCallback(
         (node) => {
-            /* setTimeout(() => { */
             if (loading) return;
             if (observer.current) observer.current.disconnect();
             observer.current = new IntersectionObserver((entries) => {
-                //console.log('task has more', hasMore);
                 if (entries[0].isIntersecting && hasMore > 0) {
                     //console.log('visible');
                     setPage((prevPage) => {
                         return prevPage + 1;
                     });
-                    /* setTasks((prevTasks) => {
-                    return [...prevTasks, ...newTasks];
-                }); */
                 }
             });
             if (node) observer.current.observe(node);
-            //console.log(node);
-            /* }, 1500); */
         },
         [loading, hasMore],
     );
@@ -101,7 +54,7 @@ const Tasks = ({
                                     <CheckBox
                                         type="checkbox"
                                         defaultChecked={task.complete}
-                                        onClick={() => handleCompletedTask(task)}
+                                        onClick={(e) => handleCompletedTask(e, task)}
                                     />
                                     {task.title}
                                 </Task>
@@ -112,7 +65,7 @@ const Tasks = ({
                                     <CheckBox
                                         type="checkbox"
                                         defaultChecked={task.complete}
-                                        onClick={() => handleCompletedTask(task)}
+                                        onClick={(e) => handleCompletedTask(e, task)}
                                     />
                                     {task.title}
                                 </Task>
