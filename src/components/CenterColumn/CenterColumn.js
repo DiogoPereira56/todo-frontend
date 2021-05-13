@@ -618,19 +618,19 @@ const CenterColumn = ({
     };
 
     const validateNewTask = Yup.object({
-        title: Yup.string().required('A Name is Required'),
+        title: Yup.string().max(70, 'At most 70 characters').required('A Name is Required'),
     });
 
     const validateRename = Yup.object({
-        listName: Yup.string().required('A Name is Required'),
+        listName: Yup.string().max(90, 'At most 37 characters').required('A Name is Required'),
     });
 
     const validateNewTitle = Yup.object({
-        title: Yup.string().required('A Name is Required'),
+        title: Yup.string().max(70, 'At most 70 characters').required('A Name is Required'),
     });
 
     const validateNewDescription = Yup.object({
-        description: Yup.string().required('A Name is Required'),
+        description: Yup.string().max(1350, 'At most 1350 characters').required('A Name is Required'),
     });
 
     if (!listInfo) {

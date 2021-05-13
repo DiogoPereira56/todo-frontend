@@ -59,8 +59,15 @@ const LoginForm = () => {
     });
 
     const validateRegister = Yup.object({
-        email: Yup.string().email('Email is invalid').required('Email is Required'),
-        name: Yup.string().min(3, 'Name must be at least 3 characters').required('A Name is required'),
+        email: Yup.string()
+            .email('Email is invalid')
+            .min(1, 'Email must be at least 1 characters')
+            .max(70, 'Email must be at most 70 characters')
+            .required('Email is Required'),
+        name: Yup.string()
+            .min(3, 'Name must be at least 3 characters')
+            .max(50, 'Name must be at most 50 characters')
+            .required('A Name is required'),
         password: Yup.string()
             .min(6, 'Password must be at least 6 characters')
             .max(12, 'Password must be at most 12 characters')

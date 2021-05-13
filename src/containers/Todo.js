@@ -85,11 +85,14 @@ const Todo = () => {
             {loadingAuth && <div>Loading...</div>}
             {errorAuth && (
                 <div>
-                    <SimpleHeader />
+                    <div>
+                        <SimpleHeader />
+                    </div>
                     <Unauthorized>
-                        <P>You are Probably not logged in</P>
-                        <br />
                         <P>
+                            You are Probably not logged in
+                            <br />
+                            <br />
                             Please go ahead and do it <A href="/">here</A>
                         </P>
                     </Unauthorized>

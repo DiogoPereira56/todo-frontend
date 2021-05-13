@@ -43,6 +43,9 @@ const Hide = styled.img`
 const TasksToolbarTitleContainer = styled.div`
     display: flex;
     padding: 10px;
+    width: 700px;
+    //background-color: brown;
+    //min-width: ${(props) => (props.changeLayout ? 'calc(100vw - 1400px)' : 'calc(100vw - 1050px)')};
 `;
 const TasksToolbarTitleItem = styled.div`
     margin-right: 20px;
@@ -71,7 +74,7 @@ const ListInput = styled.input`
 //Task Sorter
 const TaskToolbarRight = styled.div`
     //margin-left: 950px;
-    min-width: ${(props) => (props.changeLayout ? 'calc(100vw - 900px)' : 'calc(100vw - 540px)')};
+    min-width: ${(props) => (props.changeLayout ? 'calc(100vw - 1400px)' : 'calc(100vw - 1050px)')};
     text-align: right;
     //min-width: calc(100vw - 540px);
 `;

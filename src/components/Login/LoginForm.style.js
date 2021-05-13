@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
     border: 2px solid #eee;
-    margin-top: 70px;
+    position: fixed;
+    margin-top: 140px;
     margin-left: 28%;
     width: 600px;
     box-shadow: 2px 2px 2px 2px #eee;

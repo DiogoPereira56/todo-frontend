@@ -11,7 +11,8 @@ const Wrapper = styled.div`
 
 const Unauthorized = styled.div`
     border: 2px solid #eee;
-    margin-top: 130px;
+    position: fixed;
+    margin-top: 170px;
     margin-left: 28%;
     width: 600px;
     box-shadow: 2px 2px 2px 2px #eee;
@@ -25,7 +26,8 @@ const A = styled.a`
 `;
 
 const P = styled.p`
-    margin: 10px;
+    margin-top: 50px;
+    margin-bottom: 50px;
 `;
 
 const FixPosition = styled.div`

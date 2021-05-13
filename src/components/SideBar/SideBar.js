@@ -72,7 +72,7 @@ const SideBar = ({
     }
 
     const validateNewList = Yup.object({
-        listName: Yup.string().required('A Name is Required'),
+        listName: Yup.string().max(90, 'At most 37 characters').required('A Name is Required'),
     });
 
     return (
