@@ -714,6 +714,14 @@ const CenterColumn = ({
         description: Yup.string().max(1350, 'At most 1350 characters').required('A Name is Required'),
     });
 
+    if (loadingListInfo) {
+        return (
+            <NoList>
+                <H2>Loading...</H2>
+            </NoList>
+        );
+    }
+
     if (!listInfo) {
         return (
             <NoList>
