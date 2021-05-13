@@ -22,6 +22,7 @@ import { NEW_LIST_MUTATION } from '../../graphQL/Mutations';
 import { PropTypes } from 'prop-types';
 import Pagination from '../Pagination';
 import { CLIENT_TOTAL_LISTS, GET_CLIENT } from '../../graphQL/Queries';
+import { useState } from 'react';
 
 const SideBar = ({
     setChangeLayout,
@@ -38,6 +39,8 @@ const SideBar = ({
     dataClient,
     loadListInfo,
     currentPage,
+    hideSideBar,
+    setHideSideBar,
 }) => {
     const [makeNewList, { error: errorNewList }] = useMutation(NEW_LIST_MUTATION, {
         update: (cache, { data }) => {
@@ -88,10 +91,10 @@ const SideBar = ({
     });
 
     return (
-        <Wrapper>
-            <SideBar2>
+        <Wrapper hideSideBar={hideSideBar}>
+            <SideBar2 hideSideBar={hideSideBar}>
                 <H2>
-                    <Img src={menu} alt="" />
+                    <Img src={menu} alt="" onClick={() => setHideSideBar(!hideSideBar)} />
                 </H2>
                 <Ul>
                     <Li onClick={() => doShowAllTasks()}>
@@ -163,6 +166,8 @@ SideBar.propTypes = {
     dataClient: PropTypes.object,
     loadListInfo: PropTypes.func,
     currentPage: PropTypes.number,
+    hideSideBar: PropTypes.bool,
+    setHideSideBar: PropTypes.func,
 };
 
 export default SideBar;

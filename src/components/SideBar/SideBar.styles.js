@@ -3,11 +3,13 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
     display: flex;
     position: relative;
-    margin-right: 290px;
+    //margin-right: 290px;
+    margin-right: ${(props) => (props.hideSideBar ? '72px' : '290px')};
     margin-top: 52px;
 `;
 const SideBar2 = styled.div`
-    width: 290px;
+    //width: 290px;
+    width: ${(props) => (props.hideSideBar ? '72px' : '290px')};
     height: 100%;
     background: #eeeeee;
     padding: 30px 0px;

@@ -81,7 +81,7 @@ const CenterColumn = ({
     listInfo,
     loadingListInfo,
     fetchMoreListInfo,
-    setCurrentPage,
+    hideSideBar,
 }) => {
     const [renameTask, setRenameTask] = useState(false);
     const [isAsc, setIsAsc] = useState(true);
@@ -780,13 +780,6 @@ const CenterColumn = ({
                             </TasksToolbarTitleItem>
                         )}
 
-                        {/* listInfo && showAllTasks && !searchIsActive && (
-                            <Pagination
-                                listsPerPage={tasksPerPage}
-                                totalLists={totalClientAllTasks.getTotalAllTasks}
-                                setCurrentPage={setCurrentTotalTaskPage}
-                            />
-                        ) */}
                         {listInfo && !showAllTasks && searchIsActive && totalSearchedTasks && (
                             <Pagination
                                 listsPerPage={tasksPerPage}
@@ -796,8 +789,8 @@ const CenterColumn = ({
                         )}
                     </TasksToolbarTitleContainer>
 
-                    {changeLayout && (
-                        <TaskToolbarRight changeLayout>
+                    {!hideSideBar && (
+                        <TaskToolbarRight changeLayout={changeLayout}>
                             {!orderByTitle && (
                                 <>
                                     <Img src={sort} alt="" onClick={doSort} />
@@ -814,26 +807,23 @@ const CenterColumn = ({
                             )}
                         </TaskToolbarRight>
                     )}
-
-                    {!changeLayout && (
-                        <>
-                            <TaskToolbarRight>
-                                {!orderByTitle && (
-                                    <>
-                                        <Img src={sort} alt="" onClick={doSort} />
-                                        <Button onClick={doSort}>Sort</Button>
-                                    </>
-                                )}
-                                {orderByTitle && (
-                                    <div>
-                                        {isAsc && <Img src={asc} alt="" onClick={() => sortDesc()} />}
-                                        {!isAsc && <Img src={desc} alt="" onClick={() => sortAsc()} />}
-                                        Sorted
-                                        <Img src={remove} alt="" onClick={() => sortRemove()} />
-                                    </div>
-                                )}
-                            </TaskToolbarRight>
-                        </>
+                    {hideSideBar && (
+                        <TaskToolbarRight changeLayout={changeLayout} className="hideSideBar">
+                            {!orderByTitle && (
+                                <>
+                                    <Img src={sort} alt="" onClick={doSort} />
+                                    <Button onClick={doSort}>Sort</Button>
+                                </>
+                            )}
+                            {orderByTitle && (
+                                <div>
+                                    {isAsc && <Img src={asc} alt="" onClick={() => sortDesc()} />}
+                                    {!isAsc && <Img src={desc} alt="" onClick={() => sortAsc()} />}
+                                    Sorted
+                                    <Img src={remove} alt="" onClick={() => sortRemove()} />
+                                </div>
+                            )}
+                        </TaskToolbarRight>
                     )}
                 </TasksToolbar>
 
@@ -864,7 +854,6 @@ const CenterColumn = ({
                     <Tasks
                         tasks={listInfo.listQuery.taskss.tasks}
                         setChangeLayout={setChangeLayout}
-                        changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
                         setPage={setCurrentTaskPage}
@@ -878,7 +867,6 @@ const CenterColumn = ({
                     <Tasks
                         tasks={allTasksList.getAllTasks.tasks}
                         setChangeLayout={setChangeLayout}
-                        changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
                         setPage={setCurrentTotalTaskPage}
@@ -892,7 +880,6 @@ const CenterColumn = ({
                     <Tasks
                         tasks={searchedTasks.getSearchedTasks}
                         setChangeLayout={setChangeLayout}
-                        changeLayout={changeLayout}
                         setActiveTask={setActiveTask}
                         loggedIdClient={dataClient.idClient}
                         //setPage={}
@@ -983,7 +970,7 @@ CenterColumn.propTypes = {
     listInfo: PropTypes.object,
     loadingListInfo: PropTypes.bool,
     fetchMoreListInfo: PropTypes.func,
-    setCurrentPage: PropTypes.func,
+    hideSideBar: PropTypes.bool,
 };
 
 export default CenterColumn;

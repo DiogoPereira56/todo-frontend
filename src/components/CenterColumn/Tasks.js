@@ -6,7 +6,6 @@ import { Task, CheckBox, Content } from './CenterColumn.styles';
 const Tasks = ({
     tasks,
     setChangeLayout,
-    changeLayout,
     setActiveTask,
     loggedIdClient,
     setPage,
@@ -16,7 +15,9 @@ const Tasks = ({
 }) => {
     const show = (task) => {
         setActiveTask(task);
-        setChangeLayout(!changeLayout);
+        setChangeLayout((prevLayout) => {
+            return !prevLayout;
+        });
     };
 
     const handleCompletedTask = (e, task) => {
@@ -84,7 +85,6 @@ const Tasks = ({
 Tasks.propTypes = {
     tasks: PropTypes.array,
     setChangeLayout: PropTypes.func,
-    changeLayout: PropTypes.bool,
     setActiveTask: PropTypes.func,
     loggedIdClient: PropTypes.number,
     setPage: PropTypes.func,

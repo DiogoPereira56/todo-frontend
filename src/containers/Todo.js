@@ -28,6 +28,7 @@ const Todo = () => {
     const [showAllTasks, setShowAllTasks] = useState(false);
     const [orderByTitle, setOrderByTitle] = useState(false);
     const [searchIsActive, setSearchIsActive] = useState(false);
+    const [hideSideBar, setHideSideBar] = useState(false);
     //Paginated states
     const [currentPage, setCurrentPage] = useState(1);
     const [currentTaskPage, setCurrentTaskPage] = useState(1);
@@ -121,6 +122,8 @@ const Todo = () => {
                         dataClient={dataClient.getClientInformation}
                         loadListInfo={loadListInfo}
                         currentPage={currentPage}
+                        hideSideBar={hideSideBar}
+                        setHideSideBar={setHideSideBar}
                     />
 
                     {dataClient && (
@@ -152,7 +155,7 @@ const Todo = () => {
                             listInfo={listInfo}
                             loadingListInfo={loadingListInfo}
                             fetchMoreListInfo={fetchMoreListInfo}
-                            setCurrentPage={setCurrentPage}
+                            hideSideBar={hideSideBar}
                         />
                     )}
                 </Wrapper>
