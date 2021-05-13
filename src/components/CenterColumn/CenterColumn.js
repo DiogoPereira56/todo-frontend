@@ -135,6 +135,23 @@ const CenterColumn = ({
                 },
                 variables: values,
             });
+            //allTasksList
+            cache.writeQuery({
+                query: ALL_CLIENT_TASKS,
+                data: {
+                    getAllTasks: {
+                        tasks: [...existingTasks?.listQuery.taskss.tasks],
+                    },
+                },
+                variables: {
+                    idList: listInfo.listQuery.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
+            });
         },
     });
     const [newTask] = useMutation(NEW_TASK_MUTATION, {
@@ -163,6 +180,22 @@ const CenterColumn = ({
                     },
                 },
                 variables: values,
+            });
+            cache.writeQuery({
+                query: ALL_CLIENT_TASKS,
+                data: {
+                    getAllTasks: {
+                        tasks: [...existingTasks?.listQuery.taskss.tasks, newTask],
+                    },
+                },
+                variables: {
+                    idList: newTask.idList,
+                    idClient: listInfo.listQuery.idClient,
+                    limit: tasksPerPage,
+                    offset: tasksPerPage * (currentTotalTaskPage - 1),
+                    orderByTitle: orderByTitle,
+                    order: order,
+                },
             });
         },
     });
