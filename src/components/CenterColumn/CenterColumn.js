@@ -905,7 +905,13 @@ const CenterColumn = ({
 
             {changeLayout && (
                 <DescriptionContainer>
-                    {!renameTask && <H2 onClick={() => setRenameTask(true)}>{activeTask.title}</H2>}
+                    {!renameTask && (
+                        <H2 onClick={() => setRenameTask(true)}>
+                            {activeTask.title.length < 28
+                                ? `${activeTask.title}`
+                                : `${activeTask.title.substring(0, 25)}...`}
+                        </H2>
+                    )}
                     {renameTask && (
                         <Formik
                             initialValues={{ title: activeTask.title }}
