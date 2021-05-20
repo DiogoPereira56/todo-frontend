@@ -34,8 +34,14 @@ const TopNavbar = ({ name, handleSearchedTasks }) => {
                         onSubmit={handleSearchedTasks}
                     >
                         {() => (
-                            <Form>
-                                <Field placeholder="search" autoComplete="off" name="search" as={Input} />
+                            <Form data-testid="submit">
+                                <Field
+                                    data-testid="search"
+                                    placeholder="search"
+                                    autoComplete="off"
+                                    name="search"
+                                    as={Input}
+                                />
                                 <br />
                             </Form>
                         )}
@@ -53,7 +59,7 @@ const TopNavbar = ({ name, handleSearchedTasks }) => {
                             <Img src={whatsNew} alt="" />
                         </Li>
                         <Li>
-                            <p>{name}</p>
+                            <p data-testid="name">{name}</p>
                         </Li>
                         <Li>|</Li>
                         <Li>

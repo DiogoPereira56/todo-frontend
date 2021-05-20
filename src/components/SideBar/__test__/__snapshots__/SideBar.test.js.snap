@@ -1,0 +1,86 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SideBar /> matches SideBar snapshot 1`] = `
+<div
+  className="sc-bdfBwQ hNAEzB"
+>
+  <div
+    className="sc-gsTCUz bAvXS"
+  >
+    <h2
+      className="sc-dlfnbm ifTlkP"
+    >
+      <img
+        alt=""
+        className="sc-hKgILt cIkhnL"
+        onClick={[Function]}
+        src="menu.png"
+      />
+    </h2>
+    <ul
+      className="sc-iBPRYJ hMMeJ"
+    >
+      <li
+        className="sc-eCssSg hfHFtt"
+        onClick={[Function]}
+      >
+        <p
+          className="sc-jSgupP bepHJl"
+        >
+          All Tasks
+        </p>
+      </li>
+    </ul>
+    <div
+      data-testid="tasks"
+    >
+      <li
+        className="sc-eCssSg hfHFtt"
+        onClick={[Function]}
+      >
+        <p
+          className="sc-jSgupP bepHJl"
+        >
+          lista
+        </p>
+      </li>
+      <li
+        className="sc-eCssSg hfHFtt"
+        onClick={[Function]}
+      >
+        <p
+          className="sc-jSgupP bepHJl"
+        >
+          compras
+        </p>
+      </li>
+    </div>
+    <form
+      action="#"
+      onReset={[Function]}
+      onSubmit={[Function]}
+    >
+      <input
+        autoComplete="off"
+        className="sc-gKsewC eaSpDh"
+        data-testid="NLInput"
+        name="listName"
+        onBlur={[Function]}
+        onChange={[Function]}
+        placeholder=" +  New List"
+        value=""
+      />
+      <br />
+    </form>
+    <div
+      className="sc-fubCfw jUWFZp"
+    >
+      <div
+        className="sc-pFZIQ iVNzqE"
+      >
+        1
+      </div>
+    </div>
+  </div>
+</div>
+`;

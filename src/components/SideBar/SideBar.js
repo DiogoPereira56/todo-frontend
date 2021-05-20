@@ -42,7 +42,7 @@ const SideBar = ({
     hideSideBar,
     setHideSideBar,
 }) => {
-    const [makeNewList, { error: errorNewList }] = useMutation(NEW_LIST_MUTATION, {
+    const [makeNewList, { error: errorNewList, loading }] = useMutation(NEW_LIST_MUTATION, {
         update: (cache, { data }) => {
             const newListFromResponse = data?.addList;
             const existingLists = cache.readQuery({
@@ -116,6 +116,7 @@ const SideBar = ({
                         loadListInfo={loadListInfo}
                     />
                 )}
+                {loading && <p data-testid="NLloading">Loading...</p>}
 
                 <Formik
                     initialValues={{ listName: '' }}
@@ -124,7 +125,13 @@ const SideBar = ({
                 >
                     {() => (
                         <Form>
-                            <Field placeholder=" +  New List" autoComplete="off" name="listName" as={Input} />
+                            <Field
+                                data-testid="NLInput"
+                                placeholder=" +  New List"
+                                autoComplete="off"
+                                name="listName"
+                                as={Input}
+                            />
                             <br />
                         </Form>
                     )}

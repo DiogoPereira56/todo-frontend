@@ -49,7 +49,9 @@ const Todo = () => {
         loadListInfo,
         { loading: loadingListInfo, data: listInfo, fetchMore: fetchMoreListInfo },
     ] = useLazyQuery(GET_LIST_TASKS);
+    console.log(listInfo);
     const { data: dataTotalLists } = useQuery(CLIENT_TOTAL_LISTS);
+    //const dataTotalLists = 9;
 
     const doTotalSearchedTasks = (values) => {
         loadTotalSearchedTasks({
@@ -81,11 +83,16 @@ const Todo = () => {
     }, [currentPage]);
     //console.log(dataClient);
 
+    if (loadingAuth) {
+        return <p>Loading...</p>;
+    }
+
     return (
         <div>
             {loadingAuth && <div>Loading...</div>}
             {errorAuth && (
-                <div>
+                <div data-testid="error">
+                    {/* console.log(errorAuth) */}
                     <div>
                         <SimpleHeader />
                     </div>
@@ -106,7 +113,7 @@ const Todo = () => {
                 />
             )}
             {dataClient && dataTotalLists && (
-                <Wrapper>
+                <Wrapper data-testid="wrapper">
                     <SideBar
                         setChangeLayout={setChangeLayout}
                         setRename={setRename}

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Pagination /> matches Pagination snapshot 1`] = `
+<nav>
+  <div
+    className="sc-fubCfw jUWFZp"
+    data-testid="page"
+  >
+    <div
+      className="sc-pFZIQ iVNzqE"
+      onClick={[Function]}
+    >
+      1
+    </div>
+  </div>
+</nav>
+`;

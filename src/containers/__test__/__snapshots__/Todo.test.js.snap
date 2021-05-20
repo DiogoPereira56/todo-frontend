@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Todo /> matches Todo loading snapshot 1`] = `
+<p>
+  Loading...
+</p>
+`;
+
+exports[`<Todo /> matches Todo success snapshot 1`] = `
+<p>
+  Loading...
+</p>
+`;

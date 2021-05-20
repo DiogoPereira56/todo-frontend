@@ -154,7 +154,7 @@ const CenterColumn = ({
             });
         },
     });
-    const [newTask] = useMutation(NEW_TASK_MUTATION, {
+    const [newTask, { loading, data }] = useMutation(NEW_TASK_MUTATION, {
         update: (cache, { data }) => {
             const newTask = data?.addTask;
             const values = {
@@ -199,6 +199,7 @@ const CenterColumn = ({
             });
         },
     });
+    //if (loading) return <p>Loading...</p>;
     const [updateDescription] = useMutation(UPDATE_TASK_DESCRIPTION_MUTATION, {
         update: (cache, { data }) => {
             const newTask = data?.updateTaskDescription;
@@ -310,7 +311,7 @@ const CenterColumn = ({
                     query: GET_LIST_TASKS,
                     variables: values,
                 }); */
-            console.log(oldList);
+            //console.log(oldList);
 
             let newList = [];
             oldList.listQuery.taskss.tasks.forEach((t) => {
@@ -523,7 +524,8 @@ const CenterColumn = ({
 
     const getListInfo = () => {
         setTimeout(() => {
-            if (dataClient.list[0])
+            //todo add .list[0]
+            if (dataClient)
                 loadListInfo({
                     variables: {
                         idList: dataClient.list[0].idList,
@@ -584,6 +586,7 @@ const CenterColumn = ({
 
     const handleNewTask = (values) => {
         //const { idList, idClient } = listInfo.listQuery;
+        //console.log(values);
         const task = {
             title: values.title,
             idList: listInfo.listQuery.idList,
@@ -837,14 +840,16 @@ const CenterColumn = ({
 
                 {!showAllTasks && !searchIsActive && (
                     <BaseAdd>
-                        <Add>+</Add>
                         <Formik
                             initialValues={{ title: '' }}
                             validationSchema={validateNewTask}
                             onSubmit={handleNewTask}
                         >
                             {() => (
-                                <Form>
+                                <Form data-testid="formikForm">
+                                    <Add data-testid="addButton" onClick={() => handleNewTask}>
+                                        +
+                                    </Add>
                                     <Field
                                         placeholder="Add a Task"
                                         autoComplete="off"
@@ -870,6 +875,7 @@ const CenterColumn = ({
                         updateCompletion={updateCompletion}
                     />
                 )}
+                {loading && <p data-testid="NTLoading">Loading...</p>}
 
                 {allTasksList && showAllTasks && !searchIsActive && (
                     <Tasks

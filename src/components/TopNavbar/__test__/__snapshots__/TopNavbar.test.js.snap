@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TopNavbar /> matches topnavbar snapshot 1`] = `
+<div
+  className="sc-bdfBwQ kIYrtp"
+>
+  <div
+    className="sc-gsTCUz ZQrBb"
+  >
+    <img
+      alt=""
+      className="sc-jSgupP kVoUAA"
+      src="iconSquared.png"
+    />
+    <b>
+      To Do
+    </b>
+    <div
+      className="sc-gKsewC kijxMI"
+    >
+      <form
+        action="#"
+        data-testid="submit"
+        onReset={[Function]}
+        onSubmit={[Function]}
+      >
+        <input
+          autoComplete="off"
+          className="sc-iBPRYJ gPwcxt"
+          data-testid="search"
+          name="search"
+          onBlur={[Function]}
+          onChange={[Function]}
+          placeholder="search"
+          value=""
+        />
+        <br />
+      </form>
+    </div>
+    <nav
+      className="sc-dlfnbm wAeD"
+    >
+      <ul
+        className="sc-hKgILt fNjwa-d"
+      >
+        <li
+          className="sc-eCssSg jzTusa"
+        >
+          <img
+            alt=""
+            className="sc-jSgupP kVoUAA"
+            src="settings.png"
+          />
+        </li>
+        <li
+          className="sc-eCssSg jzTusa"
+        >
+          <img
+            alt=""
+            className="sc-jSgupP kVoUAA"
+            src="help.png"
+          />
+        </li>
+        <li
+          className="sc-eCssSg jzTusa"
+        >
+          <img
+            alt=""
+            className="sc-jSgupP kVoUAA"
+            src="whatsNew.png"
+          />
+        </li>
+        <li
+          className="sc-eCssSg jzTusa"
+        >
+          <p
+            data-testid="name"
+          >
+            Diogo
+          </p>
+        </li>
+        <li
+          className="sc-eCssSg jzTusa"
+        >
+          |
+        </li>
+        <li
+          className="sc-eCssSg jzTusa"
+        >
+          <p>
+            <a
+              className="sc-fubCfw gbeUsT"
+              href="/"
+              onClick={[Function]}
+            >
+              Log Out
+            </a>
+          </p>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+`;

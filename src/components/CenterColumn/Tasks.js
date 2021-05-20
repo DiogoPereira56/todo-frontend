@@ -47,12 +47,18 @@ const Tasks = ({
     if (tasks) {
         return (
             <div>
-                <Content>
+                <Content data-testid="allTasks">
                     {tasks.map((task, index) => {
                         if (tasks.length == index + 1) {
                             return (
-                                <Task ref={lastTaskRef} key={task.idTask} onClick={() => show(task)}>
+                                <Task
+                                    data-testid="lastTask"
+                                    ref={lastTaskRef}
+                                    key={task.idTask}
+                                    onClick={() => show(task)}
+                                >
                                     <CheckBox
+                                        data-testid="lastCheckBox"
                                         type="checkbox"
                                         defaultChecked={task.complete}
                                         onClick={(e) => handleCompletedTask(e, task)}

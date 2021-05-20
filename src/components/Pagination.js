@@ -15,7 +15,7 @@ const Pagination = ({ listsPerPage, totalLists, setCurrentPage }) => {
 
     return (
         <nav>
-            <PaginationWrapper>
+            <PaginationWrapper data-testid="page">
                 {pageNumbers.map((number) => (
                     <PaginnationNumber key={number} onClick={() => setCurrentPage(number)}>
                         {number}

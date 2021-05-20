@@ -37,7 +37,7 @@ const ListOfTasks = ({
     };
 
     return (
-        <div>
+        <div data-testid="tasks">
             {lists.map((list) => (
                 <Li key={list.idList} onClick={() => makeActiveList(list)}>
                     <P>{list.listName}</P>

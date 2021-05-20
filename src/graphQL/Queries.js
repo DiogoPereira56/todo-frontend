@@ -44,10 +44,12 @@ export const GET_CLIENT = gql`
         getClientInformation {
             idClient
             name
+            __typename
             list(limit: $limit, offset: $offset) {
                 idList
                 listName
                 idClient
+                __typename
             }
         }
     }
@@ -77,14 +79,17 @@ export const GET_LIST_TASKS = gql`
             idList
             idClient
             listName
+            __typename
             taskss(limit: $limit, offset: $offset, orderByTitle: $orderByTitle, order: $order) {
                 tasks {
                     idTask
                     title
                     complete
                     description
+                    __typename
                 }
                 hasMore
+                __typename
             }
         }
     }

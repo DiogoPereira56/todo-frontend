@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<SimpleHeader /> matches SimpleHeader snapshot 1`] = `
+<div
+  className="sc-bdfBwQ kIYrtp"
+>
+  <div
+    className="sc-gsTCUz ZQrBb"
+  >
+    <img
+      alt=""
+      className="sc-jSgupP kVoUAA"
+      src="iconSquared.png"
+    />
+    <b>
+      To Do
+    </b>
+  </div>
+</div>
+`;
