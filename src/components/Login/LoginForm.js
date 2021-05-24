@@ -97,7 +97,7 @@ const LoginForm = () => {
                                 <br />
                                 <Field placeholder="Email" autoComplete="off" name="email" as={Input} />
                                 <br />
-                                <Warnning>
+                                <Warnning data-testid="ErrMail">
                                     <ErrorMessage name="email" />
                                     <br />
                                 </Warnning>
@@ -110,7 +110,7 @@ const LoginForm = () => {
                                 />
                                 <br />
                                 <Warnning>
-                                    <ErrorMessage name="password" />
+                                    <ErrorMessage data-testid="ErrPass" name="password" />
                                     <br />
                                     <br />
                                 </Warnning>

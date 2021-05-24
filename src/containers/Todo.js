@@ -49,7 +49,6 @@ const Todo = () => {
         loadListInfo,
         { loading: loadingListInfo, data: listInfo, fetchMore: fetchMoreListInfo },
     ] = useLazyQuery(GET_LIST_TASKS);
-    console.log(listInfo);
     const { data: dataTotalLists } = useQuery(CLIENT_TOTAL_LISTS);
     //const dataTotalLists = 9;
 

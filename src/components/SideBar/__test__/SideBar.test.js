@@ -55,7 +55,7 @@ describe('<SideBar />', () => {
         expect(tree).toMatchSnapshot();
     });
 
-    it('renders SideBar correctly', async () => {
+    it('renders SideBar and its components correctly', async () => {
         const mockedClientData = mockGetClientData();
         const { getByTestId } = render(
             <MockedProvider mocks={[]} addTypename={false}>
@@ -63,7 +63,7 @@ describe('<SideBar />', () => {
             </MockedProvider>,
         );
         //screen.debug();
-        expect(getByTestId('tasks')).toHaveTextContent('lista');
+        expect(getByTestId('lists')).toHaveTextContent('lista');
     });
 
     it('adds a new list correctly', async () => {

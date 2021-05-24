@@ -2,7 +2,7 @@
 
 exports[`<ListOfTasks /> matches ListOfTasks snapshot 1`] = `
 <div
-  data-testid="tasks"
+  data-testid="lists"
 >
   <li
     className="sc-eCssSg hfHFtt"

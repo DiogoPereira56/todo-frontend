@@ -32,7 +32,7 @@ exports[`<SideBar /> matches SideBar snapshot 1`] = `
       </li>
     </ul>
     <div
-      data-testid="tasks"
+      data-testid="lists"
     >
       <li
         className="sc-eCssSg hfHFtt"

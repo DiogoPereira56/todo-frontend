@@ -71,7 +71,7 @@ describe('<CenterColumn />', () => {
         );
     });
 
-    it('renders CenterColumn correctly', async () => {
+    it('renders CenterColumn and its components correctly', async () => {
         const mockedClientData = mockGetClientData();
         const mockedListData = mockGetListData();
         const mockLoadListInfo = jest.fn();
@@ -117,7 +117,7 @@ describe('<CenterColumn />', () => {
 
         const loading = await waitFor(() => getByTestId('NTLoading'));
         expect(loading).toHaveTextContent('Loading...');
-        expect(newTaskInput).not.toHaveValue();
+        expect(newTaskInput).toHaveTextContent('');
 
         /* const allTasks = getByTestId('allTasks');
         console.log(prettyDOM(allTasks)); */

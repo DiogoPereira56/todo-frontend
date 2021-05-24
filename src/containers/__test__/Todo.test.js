@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 import renderer from 'react-test-renderer';
 import { MockedProvider } from '@apollo/client/testing';
 
-const mockGetClientData = () => {
+const getMocks = () => {
     return [
         {
             request: {
@@ -109,10 +109,10 @@ describe('<Todo />', () => {
     });
 
     it('matches Todo success snapshot', async () => {
-        const mockedClientData = mockGetClientData();
+        const mocks = getMocks();
         const tree = renderer
             .create(
-                <MockedProvider mocks={mockedClientData} addTypename={false}>
+                <MockedProvider mocks={mocks} addTypename={false}>
                     <Todo></Todo>
                 </MockedProvider>,
             )
@@ -121,19 +121,19 @@ describe('<Todo />', () => {
         expect(tree).toMatchSnapshot();
     });
 
-    it('renders todo correctly', async () => {
-        const mockedClientData = mockGetClientData();
+    it('renders todo and all its components correctly', async () => {
+        const mocks = getMocks();
         const { getByTestId } = render(
-            <MockedProvider mocks={mockedClientData}>
+            <MockedProvider mocks={mocks}>
                 <Todo></Todo>
             </MockedProvider>,
         );
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        screen.debug();
-
-        /* const wrapper = await waitFor(() => getByTestId('wrapper'));
-        console.log(prettyDOM(wrapper)); */
-
-        //expect(1).toEqual(2);
+        //await new Promise((resolve) => setTimeout(resolve, 100));
+        const loading = await waitFor(() => getByTestId('LILoading'));
+        //expect(loading).toHaveTextContent('Loading...');
+        expect(getByTestId('name')).toHaveTextContent('Diogo Pereira');
+        expect(getByTestId('lists')).toHaveTextContent('lista');
+        //await new Promise((resolve) => setTimeout(resolve, 0));
+        //screen.debug();
     });
 });

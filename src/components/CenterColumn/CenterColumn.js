@@ -524,8 +524,7 @@ const CenterColumn = ({
 
     const getListInfo = () => {
         setTimeout(() => {
-            //todo add .list[0]
-            if (dataClient)
+            if (dataClient && dataClient.list[0])
                 loadListInfo({
                     variables: {
                         idList: dataClient.list[0].idList,
@@ -720,7 +719,7 @@ const CenterColumn = ({
     if (loadingListInfo) {
         return (
             <NoList>
-                <H2>Loading...</H2>
+                <H2 data-testid="LILoading">Loading...</H2>
             </NoList>
         );
     }
